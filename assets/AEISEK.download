@@ -1,0 +1,28 @@
+if (document.addEventListener) {
+    document.addEventListener("DOMContentLoaded", function() {
+        loaded();
+    });
+} else if (document.attachEvent) {
+    document.attachEvent("onreadystatechange", function() {
+        loaded();
+    });
+}
+
+function loaded() {
+
+    setInterval(loop, 400);
+
+}
+
+var x = 0;
+
+var titleText = [ "⠀", "A", "AE", "AEI", "AEIS", "AEISE", "AEISEK", "AEISE", "AEIS", "AEI", "AE", "A", "⠀"];
+//var titleText = [ "⠀", "a", "a", "al", "all", "ally", "all", "al", "a", "⠀"];
+//var titleText = [ "⠀", "A", "E", "I", "S", "E", "K", "AEISEK", "A", "E", "I", "S", "E", "K", "⠀"];
+
+function loop() {
+
+    document.getElementsByTagName("title")[0].innerHTML = titleText[x++%titleText.length];
+
+}
+
