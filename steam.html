@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Таймер до скидок в Steam 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --neon: #00f0ff;
+      --accent: #ff00aa;
+      --dark: #0a0015;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      min-height: 100vh;
+      background: var(--dark);
+      color: #fff;
+      font-family: 'Roboto', sans-serif;
+      overflow-x: hidden;
+      position: relative;
+      background: linear-gradient(-45deg, #0f001a, #1a0033, #330066, #20004d);
+      background-size: 400% 400%;
+      animation: gradientBG 18s ease infinite;
+    }
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    /* Частицы на фоне */
+    #particles {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .particle {
+      position: absolute;
+      background: rgba(0, 240, 255, 0.6);
+      border-radius: 50%;
+      box-shadow: 0 0 15px var(--neon);
+      animation: float linear infinite;
+    }
+    @keyframes float {
+      0% { transform: translateY(100vh) scale(0.2); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-20vh) scale(0.8); opacity: 0; }
+    }
+    header {
+      text-align: center;
+      padding: 4rem 1rem 2rem;
+      position: relative;
+      z-index: 2;
+    }
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 4.8rem;
+      background: linear-gradient(90deg, #00f0ff, #ff00aa, #00f0ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 30px #00f0ff88, 0 0 60px #ff00aa66;
+      letter-spacing: 5px;
+      animation: neonGlow 3s ease-in-out infinite alternate;
+    }
+    @keyframes neonGlow {
+      from { text-shadow: 0 0 20px #00f0ff, 0 0 40px #00f0ff, 0 0 60px #ff00aa; }
+      to   { text-shadow: 0 0 40px #00f0ff, 0 0 80px #00f0ff, 0 0 120px #ff00aa; }
+    }
+    .subtitle {
+      font-size: 1.7rem;
+      margin: 1.2rem 0 3rem;
+      opacity: 0.9;
+      text-shadow: 0 0 15px rgba(255,255,255,0.5);
+    }
+    .countdown {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.5rem;
+      margin: 1rem 0 4rem;
+      position: relative;
+      z-index: 2;
+    }
+    .block {
+      background: rgba(20, 10, 60, 0.35);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(0, 240, 255, 0.25);
+      border-radius: 24px;
+      padding: 1.8rem 2.8rem;
+      min-width: 140px;
+      text-align: center;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5), inset 0 0 20px rgba(0,240,255,0.1);
+      transition: all 0.4s ease;
+    }
+    .block:hover {
+      transform: translateY(-12px) scale(1.05);
+      box-shadow: 0 25px 70px rgba(0,240,255,0.4), inset 0 0 30px rgba(0,240,255,0.2);
+      border-color: #ff00aa;
+    }
+    .number {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 5.5rem;
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 0 25px var(--neon), 0 0 50px var(--accent);
+      animation: pulseNumber 1.8s infinite alternate;
+    }
+    @keyframes pulseNumber {
+      from { transform: scale(1); }
+      to   { transform: scale(1.06); }
+    }
+    .label {
+      font-size: 1.2rem;
+      margin-top: 0.8rem;
+      opacity: 0.9;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #00f0ff;
+    }
+    .sales-list {
+      width: 92%;
+      max-width: 900px;
+      margin: 3rem auto 5rem;
+      padding: 2rem;
+      background: rgba(10, 5, 40, 0.4);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      border: 1px solid rgba(0,240,255,0.2);
+      box-shadow: 0 20px 80px rgba(0,0,0,0.6);
+      position: relative;
+      z-index: 2;
+    }
+    .sales-list h2 {
+      text-align: center;
+      margin-bottom: 2rem;
+      font-family: 'Orbitron', sans-serif;
+      color: #00f0ff;
+      text-shadow: 0 0 20px #00f0ff;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 1.15rem;
+    }
+    th, td {
+      padding: 1.2rem 1.5rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(0,240,255,0.15);
+    }
+    th {
+      background: rgba(0,240,255,0.1);
+      color: #ff00aa;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    tr:hover {
+      background: rgba(255,0,170,0.08);
+    }
+    footer {
+      margin-top: auto;
+      padding: 3rem 1rem 2rem;
+      text-align: center;
+      opacity: 0.8;
+      font-size: 1rem;
+      position: relative;
+      z-index: 2;
+    }
+    @media (max-width: 700px) {
+      h1 { font-size: 3.5rem; }
+      .number { font-size: 4.2rem; }
+      .block { padding: 1.4rem 2.2rem; min-width: 120px; }
+      .countdown { gap: 1.2rem; }
+      th, td { padding: 1rem; font-size: 1rem; }
+      header { padding-top: 3rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="particles"></div>
+
+  <header>
+    <h1>До скидок в Steam осталось</h1>
+    <div class="subtitle">Весенняя распродажа • 19–26 марта 2026 • Готовь кошелёк! 🔥</div>
+  </header>
+
+  <div class="countdown" id="countdown">
+    <div class="block"><div class="number" id="days">00</div><div class="label">дней</div></div>
+    <div class="block"><div class="number" id="hours">00</div><div class="label">часов</div></div>
+    <div class="block"><div class="number" id="minutes">00</div><div class="label">минут</div></div>
+    <div class="block"><div class="number" id="seconds">00</div><div class="label">секунд</div></div>
+  </div>
+
+  <div class="sales-list">
+    <h2>Календарь распродаж Steam 2026</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Распродажа</th>
+          <th>Даты</th>
+          <th>Что ждать</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Весенняя распродажа</td><td>19 — 26 марта</td><td>Первая большая — сотни хитов по минимуму</td></tr>
+        <tr><td>Летняя распродажа</td><td>25 июня — 9 июля</td><td>Самая мощная в году — до -90%</td></tr>
+        <tr><td>Осенняя распродажа</td><td>1 — 8 октября</td><td>Хорошие скидки + много новинок</td></tr>
+        <tr><td>Зимняя распродажа</td><td>17 декабря — 4 января 2027</td><td>Новогодний взрыв — максимальные скидки</td></tr>
+        <tr><td>Следующий Фест (февраль)</td><td>23 февраля — 2 марта</td><td>Бесплатные демо и выходные</td></tr>
+        <tr><td>Дом и уют Фест</td><td>30 марта — 6 апреля</td><td>Тематические игры после весны</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <footer>Обновляется в реальном времени • Скидки уже близко • Удачных покупок! 🎮💸</footer>
+
+  <script>
+    // Частицы
+    function createParticles() {
+      const container = document.getElementById('particles');
+      for (let i = 0; i < 60; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const size = Math.random() * 4 + 2;
+        p.style.width = p.style.height = size + 'px';
+        p.style.left = Math.random() * 100 + 'vw';
+        p.style.animationDuration = (Math.random() * 20 + 15) + 's';
+        p.style.animationDelay = Math.random() * 10 + 's';
+        container.appendChild(p);
+      }
+    }
+    createParticles();
+
+    // Таймер до Весенней распродажи
+    const SALE_DATE = new Date("2026-03-19T17:00:00Z").getTime();
+
+    function updateTimer() {
+      const now = Date.now();
+      let diff = SALE_DATE - now;
+
+      if (diff <= 0) {
+        document.getElementById("countdown").innerHTML = 
+          `<div style="font-size:3.5rem; color:#ff00aa; text-shadow:0 0 40px #ff00aa; text-align:center; padding:2rem;">
+             РАСПРОДАЖА НАЧАЛАСЬ!<br>Беги в Steam! 🚀💥
+           </div>`;
+        return;
+      }
+
+      const days    = Math.floor(diff / 86400000);
+      const hours   = Math.floor((diff % 86400000) / 3600000);
+      const minutes = Math.floor((diff % 3600000) / 60000);
+      const seconds = Math.floor((diff % 60000) / 1000);
+
+      document.getElementById("days").textContent    = String(days).padStart(2, '0');
+      document.getElementById("hours").textContent   = String(hours).padStart(2, '0');
+      document.getElementById("minutes").textContent = String(minutes).padStart(2, '0');
+      document.getElementById("seconds").textContent = String(seconds).padStart(2, '0');
+    }
+
+    setInterval(updateTimer, 1000);
+    updateTimer();
+  </script>
+
+</body>
+</html>
