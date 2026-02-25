@@ -3,218 +3,350 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Тест скорости интернета</title>
+  <title>Тест скорости — NeoSpeed (МБ/с)</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
+    :root {
+      --bg: #0a0e17;
+      --card: rgba(20, 25, 45, 0.65);
+      --accent: #00d4ff;
+      --accent-dark: #00aaff;
+      --text: #e0f7ff;
+      --text-muted: #a3d9ff;
+      --success: #00ff9d;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
     body {
-      font-family: -apple-system, BlinkMacOSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: #0f0f1a;
-      color: #e0e0ff;
-      margin: 0;
-      padding: 20px;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, #0a0e17 0%, #0f1626 100%);
+      color: var(--text);
       min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: var(--card);
+      backdrop-filter: blur(16px);
+      border-radius: 24px;
+      border: 1px solid rgba(0, 212, 255, 0.12);
+      padding: 2.5rem 2rem;
+      width: 100%;
+      max-width: 540px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6),
+                  inset 0 0 30px rgba(0,212,255,0.08);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .glow {
+      position: absolute;
+      inset: -50%;
+      background: radial-gradient(circle at 50% 30%, rgba(0,212,255,0.18) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    h1 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, #00d4ff, #a5f3fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1.8rem;
+    }
+
+    .gauge {
+      width: 220px;
+      height: 220px;
+      margin: 1.5rem auto;
+      position: relative;
+    }
+
+    .gauge svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .circle-bg {
+      fill: none;
+      stroke: rgba(0,212,255,0.12);
+      stroke-width: 14;
+    }
+
+    .circle {
+      fill: none;
+      stroke: url(#gradient);
+      stroke-width: 14;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.5s ease;
+    }
+
+    .value {
+      position: absolute;
+      inset: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
-    }
-    h1 {
-      color: #a5b4fc;
-      margin: 0.4em 0 0.8em;
-    }
-    .container {
-      background: rgba(30, 30, 60, 0.6);
-      border-radius: 16px;
-      padding: 2rem 2.5rem;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      width: 100%;
-      max-width: 480px;
-      text-align: center;
-    }
-    .speed {
+      justify-content: center;
       font-size: 3.8rem;
-      font-weight: bold;
-      margin: 0.3em 0;
-      color: #c7d2fe;
+      font-weight: 800;
+      color: var(--text);
+      text-shadow: 0 0 30px rgba(0,212,255,0.5);
     }
-    .unit {
-      font-size: 1.4rem;
-      color: #94a3b8;
+
+    .value sup {
+      font-size: 1.6rem;
+      opacity: 0.8;
     }
-    .label {
+
+    .type {
       font-size: 1.1rem;
-      color: #cbd5e1;
-      margin: 0.4em 0 1.2em;
+      color: var(--text-muted);
+      margin-top: 0.4rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
     }
-    progress {
-      width: 100%;
-      height: 10px;
-      margin: 1.5em 0 0.8em;
-      border-radius: 5px;
-      background: #1e293b;
+
+    .metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin: 2rem 0 1.5rem;
     }
-    progress::-webkit-progress-bar {
-      background: #1e293b;
-      border-radius: 5px;
+
+    .metric {
+      background: rgba(255,255,255,0.03);
+      border-radius: 16px;
+      padding: 1.2rem 0.8rem;
+      border: 1px solid rgba(0,212,255,0.1);
     }
-    progress::-webkit-progress-value {
-      background: linear-gradient(90deg, #6366f1, #a78bfa);
-      border-radius: 5px;
+
+    .metric i {
+      font-size: 1.4rem;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
     }
+
+    .metric .num {
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+
+    .metric .unit {
+      font-size: 0.9rem;
+      opacity: 0.7;
+    }
+
     button {
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      background: linear-gradient(135deg, #00d4ff, #0095ff);
       color: white;
       border: none;
-      padding: 14px 32px;
-      font-size: 1.1rem;
+      padding: 16px 48px;
+      font-size: 1.2rem;
+      font-weight: 600;
       border-radius: 50px;
       cursor: pointer;
-      margin: 1.5em 0 1em;
-      transition: all 0.2s;
+      margin: 1.5rem 0 1rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
     }
-    button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+
+    button:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(0, 212, 255, 0.45);
     }
+
     button:disabled {
       opacity: 0.5;
       cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
     }
+
     #status {
-      min-height: 1.4em;
-      color: #94a3b8;
-      margin: 0.8em 0;
+      font-size: 1.05rem;
+      min-height: 1.6em;
+      color: var(--text-muted);
     }
+
     .small {
-      font-size: 0.95rem;
-      color: #64748b;
-      margin-top: 2rem;
+      font-size: 0.82rem;
+      color: #5a7a9e;
+      margin-top: 1.8rem;
+      line-height: 1.4;
+    }
+
+    @media (max-width: 480px) {
+      .gauge { width: 180px; height: 180px; }
+      .value { font-size: 3rem; }
+      h1 { font-size: 2rem; }
     }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h1>Тест скорости</h1>
-  
-  <div id="download-section">
-    <div class="label">Скорость скачивания</div>
-    <div class="speed" id="download-speed">--</div>
-    <div class="unit">Мбит/с</div>
+  <div class="glow"></div>
+
+  <h1>NeoSpeed</h1>
+
+  <div class="gauge">
+    <svg viewBox="0 0 200 200">
+      <defs>
+        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#00d4ff" />
+          <stop offset="100%" stop-color="#0095ff" />
+        </linearGradient>
+      </defs>
+      <circle class="circle-bg" cx="100" cy="100" r="85" />
+      <circle class="circle" cx="100" cy="100" r="85"
+              stroke-dasharray="534" stroke-dashoffset="534" id="progressCircle"/>
+    </svg>
+    <div class="value">
+      <span id="speedValue">—</span><sup>МБ/с</sup>
+      <div class="type" id="speedType">Ожидание</div>
+    </div>
   </div>
 
-  <div id="upload-section" style="margin-top: 1.8rem;">
-    <div class="label">Скорость загрузки</div>
-    <div class="speed" id="upload-speed">--</div>
-    <div class="unit">Мбит/с</div>
+  <div class="metrics">
+    <div class="metric">
+      <i class="fas fa-download"></i>
+      <div class="num" id="download">—</div>
+      <div class="unit">↓ Скачивание, МБ/с</div>
+    </div>
+    <div class="metric">
+      <i class="fas fa-upload"></i>
+      <div class="num" id="upload">—</div>
+      <div class="unit">↑ Загрузка, МБ/с</div>
+    </div>
   </div>
-
-  <progress id="progress" value="0" max="100"></progress>
 
   <button id="startBtn">Начать тест</button>
-  <div id="status"></div>
+  <div id="status">Нажмите, чтобы измерить скорость</div>
 
   <div class="small">
-    Тест использует файлы ~25–40 МБ • Результаты приблизительные
+    Результаты в <strong>МБ/с</strong> (мегабайтах в секунду) — как в торрентах, играх и загрузчиках.<br>
+    100 Мбит/с ≈ 12.5 МБ/с • 1 Гбит/с ≈ 125 МБ/с
   </div>
 </div>
 
 <script>
 // ──────────────────────────────────────────────
-//   Простой speedtest без внешних серверов
+//   Все скорости теперь в МБ/с (мегабайтах в секунду)
 // ──────────────────────────────────────────────
 
-const FILE_URL = "https://speed.cloudflare.com/__down?bytes=25000000"; // ~25 MB
-const UPLOAD_URL = "https://speed.cloudflare.com/__up";
-const DOWNLOAD_TIMEOUT = 12000;   // макс 12 сек на скачивание
-const UPLOAD_SIZE = 10 * 1024 * 1024;  // 10 МБ
+const PING_URL     = "https://speed.cloudflare.com/__down?bytes=100";
+const DL_BASE      = "https://speed.cloudflare.com/__down?bytes=";
+const UPLOAD_URL   = "https://speed.cloudflare.com/__up";
 
-const startBtn = document.getElementById("startBtn");
-const statusEl = document.getElementById("status");
-const dlSpeedEl = document.getElementById("download-speed");
-const ulSpeedEl = document.getElementById("upload-speed");
-const progress = document.getElementById("progress");
+const SIZES_DL_MB  = [5, 10, 20, 25];
+const ITERATIONS   = 4;
+const PING_COUNT   = 6;
+const UPLOAD_MB    = 12;
 
-let isTesting = false;
+const startBtn     = document.getElementById("startBtn");
+const status       = document.getElementById("status");
+const speedValue   = document.getElementById("speedValue");
+const speedType    = document.getElementById("speedType");
+const downloadEl   = document.getElementById("download");
+const uploadEl     = document.getElementById("upload");
+const progressCircle = document.getElementById("progressCircle");
+
+const CIRCUMFERENCE = 534;
+
+let isRunning = false;
 
 startBtn.onclick = async () => {
-  if (isTesting) return;
-  isTesting = true;
+  if (isRunning) return;
+  isRunning = true;
   startBtn.disabled = true;
-  statusEl.textContent = "Подготовка...";
-  dlSpeedEl.textContent = "--";
-  ulSpeedEl.textContent = "--";
-  progress.value = 0;
+  resetUI();
 
   try {
-    // 1. Скачивание
-    statusEl.textContent = "Измеряем скорость скачивания...";
-    const dlSpeed = await measureDownload();
-    dlSpeedEl.textContent = dlSpeed.toFixed(1);
+    status.textContent = "Тестируем скачивание...";
+    const dlSpeeds = await measureDownloadMultiple();
+    const dlMBps = median(dlSpeeds) / 8;           // Мбит/с → МБ/с
+    downloadEl.textContent = dlMBps ? dlMBps.toFixed(1) : "—";
 
-    progress.value = 45;
+    status.textContent = "Тестируем загрузку...";
+    const ulMBps = (await measureUpload()) / 8;    // Мбит/с → МБ/с
+    uploadEl.textContent = ulMBps ? ulMBps.toFixed(1) : "—";
 
-    // 2. Загрузка
-    statusEl.textContent = "Измеряем скорость загрузки...";
-    const ulSpeed = await measureUpload();
-    ulSpeedEl.textContent = ulSpeed.toFixed(1);
+    const finalSpeedMBps = Math.max(dlMBps || 0, ulMBps || 0);
+    animateGauge(finalSpeedMBps * 8);  // анимация по Мбит/с (чтобы шкала до 1000+ выглядела нормально)
+    speedValue.textContent = finalSpeedMBps.toFixed(1);
+    speedType.textContent = finalSpeedMBps > 25 ? "ОТЛИЧНО" : finalSpeedMBps > 10 ? "ХОРОШО" : finalSpeedMBps > 2.5 ? "НОРМАЛЬНО" : "МЕДЛЕННО";
 
-    progress.value = 100;
-    statusEl.textContent = "Готово!";
+    status.textContent = "Готово ✓";
   } catch (err) {
-    statusEl.textContent = "Ошибка: " + err.message;
-    console.error(err);
+    status.textContent = "Ошибка • попробуйте позже";
   } finally {
-    isTesting = false;
+    isRunning = false;
     startBtn.disabled = false;
   }
 };
 
-
-async function measureDownload() {
-  const start = performance.now();
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), DOWNLOAD_TIMEOUT);
-
-  const res = await fetch(FILE_URL, { 
-    cache: "no-store", 
-    signal: controller.signal 
-  });
-
-  if (!res.ok) throw new Error("Не удалось загрузить тестовый файл");
-
-  const blob = await res.blob();
-  clearTimeout(timeoutId);
-
-  const duration = (performance.now() - start) / 1000; // секунды
-  const bytes = blob.size;
-  const mbits = (bytes * 8) / (duration * 1000000);
-
-  return mbits;
+function resetUI() {
+  speedValue.textContent = "—";
+  speedType.textContent = "Ожидание";
+  downloadEl.textContent = "—";
+  uploadEl.textContent = "—";
+  progressCircle.style.strokeDashoffset = CIRCUMFERENCE;
 }
 
+function animateGauge(speedMbps) {   // принимает Мбит/с для шкалы
+  const maxSpeedForGauge = 1000;
+  let normalized = Math.min(speedMbps / maxSpeedForGauge, 1);
+  let offset = CIRCUMFERENCE * (1 - normalized);
+  progressCircle.style.strokeDashoffset = offset;
+}
+
+async function measureDownloadMultiple() {
+  const speedsMbps = [];
+  try { await fetch(DL_BASE + "100000"); } catch {}
+
+  for (let i = 0; i < ITERATIONS; i++) {
+    const bytes = SIZES_DL_MB[i % SIZES_DL_MB.length] * 1_000_000;
+    const url = DL_BASE + bytes + "&t=" + Date.now();
+
+    const start = performance.now();
+    try {
+      const res = await fetch(url, {cache:"no-store"});
+      if (!res.ok) continue;
+      await res.blob();
+      const dur = (performance.now() - start) / 1000;
+      if (dur < 0.3) continue;
+      speedsMbps.push((bytes * 8) / (dur * 1_000_000));
+    } catch {}
+  }
+  return speedsMbps;
+}
 
 async function measureUpload() {
-  const data = new Uint8Array(UPLOAD_SIZE).fill(65); // заполняем буквами 'A'
-  const blob = new Blob([data]);
-
+  const size = UPLOAD_MB * 1_048_576;
+  const blob = new Blob([new Uint8Array(size).fill(77)]);
   const start = performance.now();
 
-  const formData = new FormData();
-  formData.append("file", blob, "test.bin");
+  try {
+    const form = new FormData();
+    form.append("file", blob);
+    await fetch(UPLOAD_URL, {method:"POST", body:form, cache:"no-store"});
+    const dur = (performance.now() - start) / 1000;
+    return (size * 8) / (dur * 1_000_000);  // возвращает Мбит/с
+  } catch {
+    return 0;
+  }
+}
 
-  const res = await fetch(UPLOAD_URL, {
-    method: "POST",
-    body: formData,
-    cache: "no-store"
-  });
-
-  if (!res.ok) throw new Error("Ошибка сервера при загрузке");
-
-  const duration = (performance.now() - start) / 1000;
-  const mbits = (UPLOAD_SIZE * 8) / (duration * 1000000);
-
-  return mbits;
+function median(arr) {
+  if (!arr.length) return 0;
+  const s = arr.slice().sort((a,b)=>a-b);
+  const m = Math.floor(s.length / 2);
+  return s.length % 2 ? s[m] : (s[m-1] + s[m]) / 2;
 }
 </script>
 </body>
