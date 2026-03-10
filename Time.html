@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Мировое Время • Cosmic Flow</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@300;400;600&family=Roboto+Mono:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #05030f;
+      --accent: #00eaff;
+      --accent-glow: #00eaff33;
+      --accent-soft: #40f0ff;
+      --text: #f0faff;
+      --text-dim: #b0d8ff;
+      --glass: rgba(12, 18, 45, 0.38);
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg-dark);
+      color: var(--text);
+      font-family: 'Roboto Mono', monospace;
+      overflow-x: hidden;
+      position: relative;
+      background: radial-gradient(ellipse at 20% 80%, #0a0022 0%, #000814 60%);
+    }
+
+    canvas#bg-particles {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .container {
+      position: relative;
+      z-index: 10;
+      min-height: 100vh;
+      padding: 4rem 1.5rem 6rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(3.2rem, 9vw, 7.2rem);
+      font-weight: 300;
+      letter-spacing: -4px;
+      background: linear-gradient(90deg, #a0f8ff, #00eaff, #a0f8ff, #40d0ff);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: gradientFlow 12s ease infinite;
+      text-shadow: 0 0 60px #00eaff44, 0 0 100px #00eaff22;
+      margin-bottom: 1rem;
+    }
+
+    .subtitle {
+      font-size: 1.3rem;
+      color: var(--text-dim);
+      margin-bottom: 4.5rem;
+      letter-spacing: 1px;
+      opacity: 0.75;
+    }
+
+    .clocks {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 2.4rem;
+      width: 100%;
+      max-width: 1280px;
+    }
+
+    .card {
+      background: var(--glass);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      border-radius: 24px;
+      border: 1px solid rgba(0, 234, 255, 0.16);
+      padding: 2.4rem 2rem;
+      box-shadow: 
+        0 12px 60px rgba(0,0,0,0.7),
+        inset 0 0 40px rgba(0, 234, 255, 0.08);
+      transition: all 0.5s cubic-bezier(0.23,1,0.32,1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: -50%;
+      background: radial-gradient(circle at 30% 20%, rgba(0,234,255,0.12) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      pointer-events: none;
+    }
+
+    .card:hover::before,
+    .card:hover {
+      opacity: 1;
+      transform: translateY(-12px) scale(1.02);
+      box-shadow: 
+        0 30px 80px rgba(0, 234, 255, 0.25),
+        inset 0 0 60px rgba(0, 234, 255, 0.12);
+      border-color: rgba(0, 234, 255, 0.35);
+    }
+
+    .city {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.1rem;
+      font-weight: 400;
+      color: var(--accent-soft);
+      margin-bottom: 0.3rem;
+      letter-spacing: 1px;
+      text-shadow: 0 0 16px var(--accent-glow);
+    }
+
+    .zone {
+      font-size: 0.98rem;
+      color: #80c0ff;
+      opacity: 0.7;
+      margin-bottom: 1.6rem;
+    }
+
+    .time {
+      font-size: clamp(4.2rem, 11vw, 7rem);
+      font-weight: 400;
+      letter-spacing: -5px;
+      color: white;
+      text-shadow: 
+        0 0 30px #00eaff88,
+        0 0 70px #00eaff44,
+        0 0 120px #00eaff22;
+      line-height: 0.92;
+    }
+
+    .seconds {
+      font-size: 0.48em;
+      vertical-align: 0.4em;
+      color: var(--accent);
+      opacity: 0.92;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%,100% { opacity: 0.92; transform: scale(1); }
+      50%     { opacity: 0.55; transform: scale(1.06); }
+    }
+
+    .date {
+      margin-top: 1.4rem;
+      font-size: 1.15rem;
+      color: #a0d0ff;
+      opacity: 0.82;
+    }
+
+    .footer {
+      margin-top: 6rem;
+      font-size: 0.96rem;
+      color: #506080;
+      text-align: center;
+      letter-spacing: 0.5px;
+    }
+
+    @keyframes gradientFlow {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @media (max-width: 700px) {
+      h1          { font-size: 3.8rem; }
+      .clocks     { gap: 1.8rem; }
+      .card       { padding: 2rem 1.6rem; }
+      .time       { font-size: 5.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="bg-particles"></canvas>
+
+<div class="container">
+  <h1>Мировое Время</h1>
+  <div class="subtitle">Космический поток • Live</div>
+
+  <div class="clocks">
+
+    <div class="card">
+      <div class="city">НЬЮ-ЙОРК</div>
+      <div class="zone">UTC−5  •  EST</div>
+      <div class="time" id="t-utc5">--:--<span class="seconds">--</span></div>
+      <div class="date" id="d-utc5">—</div>
+    </div>
+
+    <div class="card">
+      <div class="city">МОСКВА</div>
+      <div class="zone">MSK  •  UTC+3</div>
+      <div class="time" id="t-msk">--:--<span class="seconds">--</span></div>
+      <div class="date" id="d-msk">—</div>
+    </div>
+
+    <div class="card">
+      <div class="city">ТОКИО</div>
+      <div class="zone">JST  •  UTC+9</div>
+      <div class="time" id="t-tokyo">--:--<span class="seconds">--</span></div>
+      <div class="date" id="d-tokyo">—</div>
+    </div>
+
+  </div>
+
+  <div class="footer">время синхронизировано • обновление каждую секунду</div>
+</div>
+
+<script>
+// ─── Particles background ────────────────────────────────────────
+const canvas = document.getElementById('bg-particles');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+window.addEventListener('resize', () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+
+const particles = [];
+for (let i = 0; i < 80; i++) {
+  particles.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    radius: Math.random() * 1.6 + 0.4,
+    speed: Math.random() * 0.3 + 0.05,
+    alpha: Math.random() * 0.5 + 0.2
+  });
+}
+
+function animateParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(0, 234, 255, ${p.alpha})`;
+    ctx.fill();
+
+    p.y -= p.speed;
+    if (p.y < -10) {
+      p.y = canvas.height + 10;
+      p.x = Math.random() * canvas.width;
+    }
+  });
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+// ─── Clock logic ─────────────────────────────────────────────────
+function updateClocks() {
+  const now = new Date();
+  const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+
+  const zones = [
+    { id: 'utc5',  offset: -5,  name: 'utc5'  },
+    { id: 'msk',   offset:  3,  name: 'msk'   },
+    { id: 'tokyo', offset:  9,  name: 'tokyo' }
+  ];
+
+  zones.forEach(z => {
+    const d = new Date(utc + z.offset * 3600000);
+    const h = String(d.getHours()).padStart(2,'0');
+    const m = String(d.getMinutes()).padStart(2,'0');
+    const s = String(d.getSeconds()).padStart(2,'0');
+
+    document.getElementById(`t-${z.name}`).innerHTML = `${h}:${m}<span class="seconds">${s}</span>`;
+
+    const dateStr = d.toLocaleDateString('ru-RU', {
+      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+    });
+    document.getElementById(`d-${z.name}`).textContent = 
+      dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+  });
+}
+
+updateClocks();
+setInterval(updateClocks, 1000);
+</script>
+
+</body>
+</html>
