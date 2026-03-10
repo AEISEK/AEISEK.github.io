@@ -4,9 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Мировое Время • Cosmic Flow</title>
+
+  <!-- Favicon: неоновый циферблат в космическом стиле -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><filter id='glow' x='-50%' y='-50%' width='200%' height='200%'><feGaussianBlur stdDeviation='3.5' result='coloredBlur'/><feMerge><feMergeNode in='coloredBlur'/><feMergeNode in='SourceGraphic'/></feMerge></filter></defs><circle cx='50' cy='50' r='44' fill='none' stroke='%2300eaff' stroke-width='6' filter='url(%23glow)' opacity='0.92'/><circle cx='50' cy='50' r='5' fill='%2300eaff' filter='url(%23glow)'/><path d='M50 10 L50 30 M50 90 L50 70 M10 50 L30 50 M90 50 L70 50 M32 32 L44 44 M68 68 L56 56 M32 68 L44 56 M68 32 L56 44' stroke='%2300eaff' stroke-width='9' stroke-linecap='round' filter='url(%23glow)' opacity='0.88'/></svg>" type="image/svg+xml">
+
+  <!-- Для мобильных устройств (Apple Touch Icon) -->
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><circle cx='90' cy='90' r='82' fill='none' stroke='%2300eaff' stroke-width='12' opacity='0.9'/><path d='M90 25 L90 55 M90 155 L90 125 M25 90 L55 90 M155 90 L125 90' stroke='%2300eaff' stroke-width='20' stroke-linecap='round' opacity='0.85'/></svg>">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@300;400;600&family=Roboto+Mono:wght@300;400&display=swap" rel="stylesheet">
+
   <style>
     :root {
       --bg-dark: #05030f;
@@ -267,9 +275,9 @@ function updateClocks() {
   const utc = now.getTime() + now.getTimezoneOffset() * 60000;
 
   const zones = [
-    { id: 'utc5',  offset: -5,  name: 'utc5'  },
-    { id: 'msk',   offset:  3,  name: 'msk'   },
-    { id: 'tokyo', offset:  9,  name: 'tokyo' }
+    { id: 'utc5',  offset: -5 },
+    { id: 'msk',   offset: +3 },
+    { id: 'tokyo', offset: +9 }
   ];
 
   zones.forEach(z => {
@@ -278,12 +286,12 @@ function updateClocks() {
     const m = String(d.getMinutes()).padStart(2,'0');
     const s = String(d.getSeconds()).padStart(2,'0');
 
-    document.getElementById(`t-${z.name}`).innerHTML = `${h}:${m}<span class="seconds">${s}</span>`;
+    document.getElementById(`t-${z.id}`).innerHTML = `${h}:${m}<span class="seconds">${s}</span>`;
 
     const dateStr = d.toLocaleDateString('ru-RU', {
       weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
     });
-    document.getElementById(`d-${z.name}`).textContent = 
+    document.getElementById(`d-${z.id}`).textContent = 
       dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
   });
 }
