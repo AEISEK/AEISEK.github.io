@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Таймер Steam распродаж 2026</title>
+
+  <link rel="icon" type="image/svg+xml" href="https://upload.wikimedia.org/wikipedia/commons/8/83/Steam_icon_logo.svg">
+  <link rel="icon" type="image/png" href="https://icons8.com/icon/85425/steam" sizes="32x32">
+  <link rel="apple-touch-icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Steam_icon_logo.svg/512px-Steam_icon_logo.svg.png">
+
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --neon: #00f0ff;
+      --accent: #ff00aa;
+      --dark: #0a0015;
+      --success: #00ff9d;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      min-height: 100vh;
+      background: var(--dark);
+      color: #fff;
+      font-family: 'Roboto', sans-serif;
+      overflow-x: hidden;
+      position: relative;
+      background: linear-gradient(-45deg, #0f001a, #1a0033, #330066, #20004d);
+      background-size: 400% 400%;
+      animation: gradientBG 18s ease infinite;
+    }
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    #particles { position: fixed; inset: 0; pointer-events: none; z-index: 1; }
+    .particle {
+      position: absolute;
+      background: rgba(0, 240, 255, 0.6);
+      border-radius: 50%;
+      box-shadow: 0 0 15px var(--neon);
+      animation: float linear infinite;
+    }
+    @keyframes float {
+      0% { transform: translateY(100vh) scale(0.2); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-20vh) scale(0.8); opacity: 0; }
+    }
+    header { text-align: center; padding: 4rem 1rem 2rem; position: relative; z-index: 2; }
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 4.5rem;
+      background: linear-gradient(90deg, #00f0ff, #ff00aa, #00f0ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 30px #00f0ff88, 0 0 60px #ff00aa66;
+      letter-spacing: 4px;
+      animation: neonGlow 3s ease-in-out infinite alternate;
+    }
+    @keyframes neonGlow {
+      from { text-shadow: 0 0 20px #00f0ff, 0 0 40px #00f0ff, 0 0 60px #ff00aa; }
+      to   { text-shadow: 0 0 40px #00f0ff, 0 0 80px #00f0ff, 0 0 120px #ff00aa; }
+    }
+    .subtitle { font-size: 1.65rem; margin: 1.2rem 0 2.5rem; opacity: 0.9; }
+    .status { font-size: 1.4rem; margin-bottom: 1rem; font-weight: 500; }
+
+    .countdown {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5rem;
+      margin: 1rem 0 4rem; position: relative; z-index: 2;
+    }
+    .block {
+      background: rgba(20, 10, 60, 0.35);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(0, 240, 255, 0.25);
+      border-radius: 24px;
+      padding: 1.8rem 2.8rem;
+      min-width: 140px;
+      text-align: center;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5), inset 0 0 20px rgba(0,240,255,0.1);
+      transition: all 0.4s ease;
+    }
+    .block:hover { transform: translateY(-12px) scale(1.05); border-color: #ff00aa; }
+    .number {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 5.3rem;
+      font-weight: 900;
+      text-shadow: 0 0 25px var(--neon), 0 0 50px var(--accent);
+      animation: pulseNumber 1.8s infinite alternate;
+    }
+    @keyframes pulseNumber { from { transform: scale(1); } to { transform: scale(1.06); } }
+    .label { font-size: 1.2rem; margin-top: 0.8rem; opacity: 0.9; text-transform: uppercase; letter-spacing: 2px; color: #00f0ff; }
+
+    .active-sale { border-color: var(--success); box-shadow: 0 0 40px rgba(0,255,157,0.4); }
+    .ended { color: #ff5555; }
+
+    .sales-list { width: 92%; max-width: 920px; margin: 3rem auto 5rem; padding: 2rem;
+      background: rgba(10, 5, 40, 0.4); backdrop-filter: blur(20px);
+      border-radius: 24px; border: 1px solid rgba(0,240,255,0.2);
+      box-shadow: 0 20px 80px rgba(0,0,0,0.6); position: relative; z-index: 2;
+    }
+    .sales-list h2 { text-align: center; margin-bottom: 2rem; color: #00f0ff; text-shadow: 0 0 20px #00f0ff; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 1.15rem; }
+    th, td { padding: 1.2rem 1.5rem; text-align: left; border-bottom: 1px solid rgba(0,240,255,0.15); }
+    th { background: rgba(0,240,255,0.1); color: #ff00aa; text-transform: uppercase; letter-spacing: 1px; }
+    tr:hover { background: rgba(255,0,170,0.08); }
+
+    footer { margin-top: auto; padding: 3rem 1rem 2rem; text-align: center; opacity: 0.8; font-size: 1rem; position: relative; z-index: 2; }
+    .steam-btn {
+      display: inline-block; margin-top: 1.5rem; padding: 14px 32px;
+      background: linear-gradient(90deg, #00f0ff, #ff00aa);
+      color: #000; font-weight: bold; font-size: 1.2rem;
+      border-radius: 50px; text-decoration: none; transition: 0.3s;
+    }
+    .steam-btn:hover { transform: scale(1.08); box-shadow: 0 0 30px #ff00aa; }
+
+    @media (max-width: 700px) {
+      h1 { font-size: 3.4rem; }
+      .number { font-size: 4rem; }
+      .block { padding: 1.3rem 2rem; min-width: 115px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="particles"></div>
+
+  <header>
+    <h1>Steam Распродажи 2026</h1>
+    <div class="subtitle" id="event-title">Весенняя распродажа</div>
+    <div class="status" id="status"></div>
+  </header>
+
+  <div class="countdown" id="countdown"></div>
+
+  <div class="sales-list">
+    <h2>Календарь распродаж Steam 2026</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Распродажа</th>
+          <th>Даты</th>
+          <th>Что ждать</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Весенняя распродажа</td><td>19 — 26 марта</td><td>Первая большая — сотни хитов по минимуму</td></tr>
+        <tr><td>Дом и уют Фест</td><td>30 марта — 6 апреля</td><td>Тематические игры про дом и уют</td></tr>
+        <tr><td>Летняя распродажа</td><td>25 июня — 9 июля</td><td>Самая мощная в году — до -90%</td></tr>
+        <tr><td>Осенняя распродажа</td><td>1 — 8 октября</td><td>Хорошие скидки + много новинок</td></tr>
+        <tr><td>Зимняя распродажа</td><td>17 декабря — 4 января 2027</td><td>Новогодний взрыв — максимальные скидки</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <footer>
+    Обновляется в реальном времени • <a href="https://store.steampowered.com/" target="_blank" class="steam-btn">Перейти в Steam</a><br>
+    Удачных покупок! 🎮💸
+  </footer>
+
+  <script>
+    // Частицы
+    function createParticles() {
+      const container = document.getElementById('particles');
+      for (let i = 0; i < 60; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const size = Math.random() * 4 + 2;
+        p.style.width = p.style.height = size + 'px';
+        p.style.left = Math.random() * 100 + 'vw';
+        p.style.animationDuration = (Math.random() * 20 + 15) + 's';
+        p.style.animationDelay = Math.random() * 10 + 's';
+        container.appendChild(p);
+      }
+    }
+    createParticles();
+
+    // Даты (время по UTC, как у Valve — 10:00 AM PT = 17:00 UTC)
+    const SPRING_START = new Date("2026-03-19T17:00:00Z").getTime();
+    const SPRING_END   = new Date("2026-03-26T17:00:00Z").getTime();
+    const NEXT_EVENT   = new Date("2026-03-30T17:00:00Z").getTime(); // Дом и уют Фест
+
+    function updateTimer() {
+      const now = Date.now();
+      const countdownEl = document.getElementById("countdown");
+      const statusEl = document.getElementById("status");
+      const titleEl = document.getElementById("event-title");
+
+      let diff, message, isActive = false;
+
+      if (now < SPRING_START) {
+        // До начала
+        diff = SPRING_START - now;
+        titleEl.textContent = "До Весенней распродажи осталось";
+        statusEl.innerHTML = `<span style="color:#00f0ff;">⏳ Скоро начнётся</span>`;
+      } 
+      else if (now >= SPRING_START && now < SPRING_END) {
+        // Идёт сейчас
+        diff = SPRING_END - now;
+        titleEl.textContent = "Весенняя распродажа идёт!";
+        statusEl.innerHTML = `<span style="color:#00ff9d; font-size:1.6rem;">🔥 РАСПРОДАЖА АКТИВНА! 🔥</span>`;
+        isActive = true;
+      } 
+      else {
+        // Закончилась
+        diff = NEXT_EVENT - now;
+        titleEl.textContent = "Весенняя распродажа закончилась";
+        statusEl.innerHTML = `<span style="color:#ff5555;">😔 Закончилась 26 марта</span>`;
+      }
+
+      if (diff <= 0) {
+        countdownEl.innerHTML = `<div style="font-size:3.2rem; color:#ff00aa; text-align:center; padding:3rem 1rem;">
+          Следующее событие скоро!<br>Следи за обновлениями
+        </div>`;
+        return;
+      }
+
+      const days    = Math.floor(diff / 86400000);
+      const hours   = Math.floor((diff % 86400000) / 3600000);
+      const minutes = Math.floor((diff % 3600000) / 60000);
+      const seconds = Math.floor((diff % 60000) / 1000);
+
+      let html = `
+        <div class="block ${isActive ? 'active-sale' : ''}">
+          <div class="number">${String(days).padStart(2, '0')}</div>
+          <div class="label">дней</div>
+        </div>
+        <div class="block ${isActive ? 'active-sale' : ''}">
+          <div class="number">${String(hours).padStart(2, '0')}</div>
+          <div class="label">часов</div>
+        </div>
+        <div class="block ${isActive ? 'active-sale' : ''}">
+          <div class="number">${String(minutes).padStart(2, '0')}</div>
+          <div class="label">минут</div>
+        </div>
+        <div class="block ${isActive ? 'active-sale' : ''}">
+          <div class="number">${String(seconds).padStart(2, '0')}</div>
+          <div class="label">секунд</div>
+        </div>
+      `;
+
+      countdownEl.innerHTML = html;
+    }
+
+    setInterval(updateTimer, 1000);
+    updateTimer();
+  </script>
+</body>
+</html>
