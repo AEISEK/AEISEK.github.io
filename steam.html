@@ -6,9 +6,6 @@
   <title>Таймер Steam распродаж 2026</title>
 
   <link rel="icon" type="image/svg+xml" href="https://upload.wikimedia.org/wikipedia/commons/8/83/Steam_icon_logo.svg">
-  <link rel="icon" type="image/png" href="https://icons8.com/icon/85425/steam" sizes="32x32">
-  <link rel="apple-touch-icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Steam_icon_logo.svg/512px-Steam_icon_logo.svg.png">
-
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
 
   <style>
@@ -131,7 +128,7 @@
 
   <header>
     <h1>Steam Распродажи 2026</h1>
-    <div class="subtitle" id="event-title">Весенняя распродажа</div>
+    <div class="subtitle" id="event-title">Загрузка...</div>
     <div class="status" id="status"></div>
   </header>
 
@@ -179,10 +176,43 @@
     }
     createParticles();
 
-    // Даты (время по UTC, как у Valve — 10:00 AM PT = 17:00 UTC)
-    const SPRING_START = new Date("2026-03-19T17:00:00Z").getTime();
-    const SPRING_END   = new Date("2026-03-26T17:00:00Z").getTime();
-    const NEXT_EVENT   = new Date("2026-03-30T17:00:00Z").getTime(); // Дом и уют Фест
+    // === Все события 2026 года (время UTC) ===
+    const events = [
+      {
+        name: "Весенняя распродажа",
+        start: new Date("2026-03-19T17:00:00Z").getTime(),
+        end:   new Date("2026-03-26T17:00:00Z").getTime()
+      },
+      {
+        name: "Дом и уют Фест",
+        start: new Date("2026-03-30T17:00:00Z").getTime(),
+        end:   new Date("2026-04-06T17:00:00Z").getTime()
+      },
+      {
+        name: "Летняя распродажа",
+        start: new Date("2026-06-25T17:00:00Z").getTime(),
+        end:   new Date("2026-07-09T17:00:00Z").getTime()
+      },
+      {
+        name: "Осенняя распродажа",
+        start: new Date("2026-10-01T17:00:00Z").getTime(),
+        end:   new Date("2026-10-08T17:00:00Z").getTime()
+      },
+      {
+        name: "Зимняя распродажа",
+        start: new Date("2026-12-17T17:00:00Z").getTime(),
+        end:   new Date("2027-01-04T17:00:00Z").getTime()
+      }
+    ];
+
+    function getCurrentOrNextEvent(now) {
+      for (let event of events) {
+        if (now < event.end) {
+          return event;
+        }
+      }
+      return null; // все закончились
+    }
 
     function updateTimer() {
       const now = Date.now();
@@ -190,32 +220,33 @@
       const statusEl = document.getElementById("status");
       const titleEl = document.getElementById("event-title");
 
-      let diff, message, isActive = false;
+      const currentEvent = getCurrentOrNextEvent(now);
 
-      if (now < SPRING_START) {
-        // До начала
-        diff = SPRING_START - now;
-        titleEl.textContent = "До Весенней распродажи осталось";
-        statusEl.innerHTML = `<span style="color:#00f0ff;">⏳ Скоро начнётся</span>`;
-      } 
-      else if (now >= SPRING_START && now < SPRING_END) {
-        // Идёт сейчас
-        diff = SPRING_END - now;
-        titleEl.textContent = "Весенняя распродажа идёт!";
+      if (!currentEvent) {
+        // Все распродажи 2026 закончились
+        titleEl.textContent = "2026 год завершён";
+        statusEl.innerHTML = `<span style="color:#ff5555;">Ожидаем расписание 2027</span>`;
+        countdownEl.innerHTML = `<div style="font-size:2.8rem; color:#ff00aa; text-align:center; padding:3rem 1rem;">
+          Спасибо за 2026! 🎉<br>До новых встреч в 2027
+        </div>`;
+        return;
+      }
+
+      const isActive = now >= currentEvent.start && now < currentEvent.end;
+      let diff;
+
+      if (isActive) {
+        diff = currentEvent.end - now;
+        titleEl.textContent = `${currentEvent.name} идёт!`;
         statusEl.innerHTML = `<span style="color:#00ff9d; font-size:1.6rem;">🔥 РАСПРОДАЖА АКТИВНА! 🔥</span>`;
-        isActive = true;
-      } 
-      else {
-        // Закончилась
-        diff = NEXT_EVENT - now;
-        titleEl.textContent = "Весенняя распродажа закончилась";
-        statusEl.innerHTML = `<span style="color:#ff5555;">😔 Закончилась 26 марта</span>`;
+      } else {
+        diff = currentEvent.start - now;
+        titleEl.textContent = `До ${currentEvent.name} осталось`;
+        statusEl.innerHTML = `<span style="color:#00f0ff;">⏳ Скоро начнётся</span>`;
       }
 
       if (diff <= 0) {
-        countdownEl.innerHTML = `<div style="font-size:3.2rem; color:#ff00aa; text-align:center; padding:3rem 1rem;">
-          Следующее событие скоро!<br>Следи за обновлениями
-        </div>`;
+        updateTimer(); // рекурсия на следующий цикл
         return;
       }
 
