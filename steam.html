@@ -32,6 +32,7 @@
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
+
     #particles { position: fixed; inset: 0; pointer-events: none; z-index: 1; }
     .particle {
       position: absolute;
@@ -46,6 +47,7 @@
       90% { opacity: 1; }
       100% { transform: translateY(-20vh) scale(0.8); opacity: 0; }
     }
+
     header { text-align: center; padding: 4rem 1rem 2rem; position: relative; z-index: 2; }
     h1 {
       font-family: 'Orbitron', sans-serif;
@@ -62,6 +64,7 @@
       from { text-shadow: 0 0 20px #00f0ff, 0 0 40px #00f0ff, 0 0 60px #ff00aa; }
       to   { text-shadow: 0 0 40px #00f0ff, 0 0 80px #00f0ff, 0 0 120px #ff00aa; }
     }
+
     .subtitle { font-size: 1.65rem; margin: 1.2rem 0 2.5rem; opacity: 0.9; }
     .status { font-size: 1.4rem; margin-bottom: 1rem; font-weight: 500; }
 
@@ -92,9 +95,21 @@
     .label { font-size: 1.2rem; margin-top: 0.8rem; opacity: 0.9; text-transform: uppercase; letter-spacing: 2px; color: #00f0ff; }
 
     .active-sale { border-color: var(--success); box-shadow: 0 0 40px rgba(0,255,157,0.4); }
-    .ended { color: #ff5555; }
 
-    .sales-list { width: 92%; max-width: 920px; margin: 3rem auto 5rem; padding: 2rem;
+    /* === Стили для прошедших распродаж === */
+    .past {
+      opacity: 0.65;
+    }
+    .past td {
+      text-decoration: line-through;
+      color: #aaaaaa;
+    }
+    .past td:first-child {
+      color: #ff5555;
+    }
+
+    .sales-list { 
+      width: 92%; max-width: 920px; margin: 3rem auto 5rem; padding: 2rem;
       background: rgba(10, 5, 40, 0.4); backdrop-filter: blur(20px);
       border-radius: 24px; border: 1px solid rgba(0,240,255,0.2);
       box-shadow: 0 20px 80px rgba(0,0,0,0.6); position: relative; z-index: 2;
@@ -135,8 +150,8 @@
   <div class="countdown" id="countdown"></div>
 
   <div class="sales-list">
-    <h2>Календарь распродаж Steam 2026</h2>
-    <table>
+    <h2>Основные распродажи Steam 2026</h2>
+    <table id="sales-table">
       <thead>
         <tr>
           <th>Распродажа</th>
@@ -145,11 +160,26 @@
         </tr>
       </thead>
       <tbody>
-        <tr><td>Весенняя распродажа</td><td>19 — 26 марта</td><td>Первая большая — сотни хитов по минимуму</td></tr>
-        <tr><td>Дом и уют Фест</td><td>30 марта — 6 апреля</td><td>Тематические игры про дом и уют</td></tr>
-        <tr><td>Летняя распродажа</td><td>25 июня — 9 июля</td><td>Самая мощная в году — до -90%</td></tr>
-        <tr><td>Осенняя распродажа</td><td>1 — 8 октября</td><td>Хорошие скидки + много новинок</td></tr>
-        <tr><td>Зимняя распродажа</td><td>17 декабря — 4 января 2027</td><td>Новогодний взрыв — максимальные скидки</td></tr>
+        <tr data-event="spring">
+          <td>Весенняя распродажа</td>
+          <td>19 — 26 марта</td>
+          <td>Первая большая — сотни хитов по минимуму</td>
+        </tr>
+        <tr data-event="summer">
+          <td>Летняя распродажа</td>
+          <td>25 июня — 9 июля</td>
+          <td>Самая мощная в году — до -90%</td>
+        </tr>
+        <tr data-event="autumn">
+          <td>Осенняя распродажа</td>
+          <td>1 — 8 октября</td>
+          <td>Хорошие скидки + много новинок</td>
+        </tr>
+        <tr data-event="winter">
+          <td>Зимняя распродажа</td>
+          <td>17 декабря — 4 января 2027</td>
+          <td>Новогодний взрыв — максимальные скидки</td>
+        </tr>
       </tbody>
     </table>
   </div>
@@ -176,42 +206,34 @@
     }
     createParticles();
 
-    // === Все события 2026 года (время UTC) ===
+    // Основные распродажи
     const events = [
-      {
-        name: "Весенняя распродажа",
-        start: new Date("2026-03-19T17:00:00Z").getTime(),
-        end:   new Date("2026-03-26T17:00:00Z").getTime()
-      },
-      {
-        name: "Дом и уют Фест",
-        start: new Date("2026-03-30T17:00:00Z").getTime(),
-        end:   new Date("2026-04-06T17:00:00Z").getTime()
-      },
-      {
-        name: "Летняя распродажа",
-        start: new Date("2026-06-25T17:00:00Z").getTime(),
-        end:   new Date("2026-07-09T17:00:00Z").getTime()
-      },
-      {
-        name: "Осенняя распродажа",
-        start: new Date("2026-10-01T17:00:00Z").getTime(),
-        end:   new Date("2026-10-08T17:00:00Z").getTime()
-      },
-      {
-        name: "Зимняя распродажа",
-        start: new Date("2026-12-17T17:00:00Z").getTime(),
-        end:   new Date("2027-01-04T17:00:00Z").getTime()
-      }
+      { id: "spring",  name: "Весенняя распродажа", start: new Date("2026-03-19T17:00:00Z").getTime(), end: new Date("2026-03-26T17:00:00Z").getTime() },
+      { id: "summer",  name: "Летняя распродажа",   start: new Date("2026-06-25T17:00:00Z").getTime(), end: new Date("2026-07-09T17:00:00Z").getTime() },
+      { id: "autumn",  name: "Осенняя распродажа",  start: new Date("2026-10-01T17:00:00Z").getTime(), end: new Date("2026-10-08T17:00:00Z").getTime() },
+      { id: "winter",  name: "Зимняя распродажа",   start: new Date("2026-12-17T17:00:00Z").getTime(), end: new Date("2027-01-04T17:00:00Z").getTime() }
     ];
 
     function getCurrentOrNextEvent(now) {
       for (let event of events) {
-        if (now < event.end) {
-          return event;
-        }
+        if (now < event.end) return event;
       }
-      return null; // все закончились
+      return null;
+    }
+
+    function updateTable(now) {
+      const rows = document.querySelectorAll('#sales-table tbody tr');
+      
+      rows.forEach(row => {
+        const eventId = row.getAttribute('data-event');
+        const event = events.find(e => e.id === eventId);
+        
+        if (event && now > event.end) {
+          row.classList.add('past');
+        } else {
+          row.classList.remove('past');
+        }
+      });
     }
 
     function updateTimer() {
@@ -222,8 +244,10 @@
 
       const currentEvent = getCurrentOrNextEvent(now);
 
+      // Обновляем таблицу (зачёркиваем прошлые)
+      updateTable(now);
+
       if (!currentEvent) {
-        // Все распродажи 2026 закончились
         titleEl.textContent = "2026 год завершён";
         statusEl.innerHTML = `<span style="color:#ff5555;">Ожидаем расписание 2027</span>`;
         countdownEl.innerHTML = `<div style="font-size:2.8rem; color:#ff00aa; text-align:center; padding:3rem 1rem;">
@@ -233,21 +257,14 @@
       }
 
       const isActive = now >= currentEvent.start && now < currentEvent.end;
-      let diff;
+      let diff = isActive ? currentEvent.end - now : currentEvent.start - now;
 
       if (isActive) {
-        diff = currentEvent.end - now;
         titleEl.textContent = `${currentEvent.name} идёт!`;
         statusEl.innerHTML = `<span style="color:#00ff9d; font-size:1.6rem;">🔥 РАСПРОДАЖА АКТИВНА! 🔥</span>`;
       } else {
-        diff = currentEvent.start - now;
         titleEl.textContent = `До ${currentEvent.name} осталось`;
         statusEl.innerHTML = `<span style="color:#00f0ff;">⏳ Скоро начнётся</span>`;
-      }
-
-      if (diff <= 0) {
-        updateTimer(); // рекурсия на следующий цикл
-        return;
       }
 
       const days    = Math.floor(diff / 86400000);
