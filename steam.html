@@ -3,299 +3,477 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Таймер Steam распродаж 2026</title>
-
+  <title>Steam распродажи 2026</title>
   <link rel="icon" type="image/svg+xml" href="https://upload.wikimedia.org/wikipedia/commons/8/83/Steam_icon_logo.svg">
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      --neon: #00f0ff;
-      --accent: #ff00aa;
-      --dark: #0a0015;
-      --success: #00ff9d;
+      --bg: #080c10;
+      --surface: #0f1520;
+      --card: #141b2a;
+      --border: rgba(255,255,255,0.07);
+      --border-active: rgba(100,200,255,0.25);
+      --text: #e8edf5;
+      --muted: #5a6a82;
+      --accent: #4da6ff;
+      --accent2: #ff6b35;
+      --green: #2de08c;
+      --past: #2a1a1a;
+      --past-text: #5a3a3a;
     }
     * { margin:0; padding:0; box-sizing:border-box; }
     body {
-      min-height: 100vh;
-      background: var(--dark);
-      color: #fff;
-      font-family: 'Roboto', sans-serif;
-      overflow-x: hidden;
-      position: relative;
-      background: linear-gradient(-45deg, #0f001a, #1a0033, #330066, #20004d);
-      background-size: 400% 400%;
-      animation: gradientBG 18s ease infinite;
-    }
-    @keyframes gradientBG {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+      min-height:100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
     }
 
-    #particles { position: fixed; inset: 0; pointer-events: none; z-index: 1; }
-    .particle {
-      position: absolute;
-      background: rgba(0, 240, 255, 0.6);
-      border-radius: 50%;
-      box-shadow: 0 0 15px var(--neon);
-      animation: float linear infinite;
-    }
-    @keyframes float {
-      0% { transform: translateY(100vh) scale(0.2); opacity: 0; }
-      10% { opacity: 1; }
-      90% { opacity: 1; }
-      100% { transform: translateY(-20vh) scale(0.8); opacity: 0; }
-    }
-
-    header { text-align: center; padding: 4rem 1rem 2rem; position: relative; z-index: 2; }
-    h1 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 4.5rem;
-      background: linear-gradient(90deg, #00f0ff, #ff00aa, #00f0ff);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      text-shadow: 0 0 30px #00f0ff88, 0 0 60px #ff00aa66;
-      letter-spacing: 4px;
-      animation: neonGlow 3s ease-in-out infinite alternate;
-    }
-    @keyframes neonGlow {
-      from { text-shadow: 0 0 20px #00f0ff, 0 0 40px #00f0ff, 0 0 60px #ff00aa; }
-      to   { text-shadow: 0 0 40px #00f0ff, 0 0 80px #00f0ff, 0 0 120px #ff00aa; }
-    }
-
-    .subtitle { font-size: 1.65rem; margin: 1.2rem 0 2.5rem; opacity: 0.9; }
-    .status { font-size: 1.4rem; margin-bottom: 1rem; font-weight: 500; }
-
-    .countdown {
-      display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5rem;
-      margin: 1rem 0 4rem; position: relative; z-index: 2;
-    }
-    .block {
-      background: rgba(20, 10, 60, 0.35);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(0, 240, 255, 0.25);
-      border-radius: 24px;
-      padding: 1.8rem 2.8rem;
-      min-width: 140px;
+    /* HERO */
+    .hero {
+      padding: 5rem 2rem 3rem;
       text-align: center;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.5), inset 0 0 20px rgba(0,240,255,0.1);
-      transition: all 0.4s ease;
+      position: relative;
     }
-    .block:hover { transform: translateY(-12px) scale(1.05); border-color: #ff00aa; }
-    .number {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 5.3rem;
-      font-weight: 900;
-      text-shadow: 0 0 25px var(--neon), 0 0 50px var(--accent);
-      animation: pulseNumber 1.8s infinite alternate;
+    .hero::after {
+      content:'';
+      position:absolute;
+      bottom:0; left:50%; transform:translateX(-50%);
+      width:400px; height:1px;
+      background: linear-gradient(90deg, transparent, var(--border-active), transparent);
     }
-    @keyframes pulseNumber { from { transform: scale(1); } to { transform: scale(1.06); } }
-    .label { font-size: 1.2rem; margin-top: 0.8rem; opacity: 0.9; text-transform: uppercase; letter-spacing: 2px; color: #00f0ff; }
+    .hero-tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid rgba(77,166,255,0.25);
+      border-radius: 20px;
+      padding: 5px 16px;
+      margin-bottom: 1.5rem;
+    }
+    .hero h1 {
+      font-size: clamp(2.4rem, 6vw, 4.8rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      color: var(--text);
+    }
+    .hero h1 span {
+      color: var(--accent);
+    }
+    .hero-sub {
+      margin-top: 1rem;
+      font-size: 1.05rem;
+      color: var(--muted);
+      font-weight: 300;
+    }
 
-    .active-sale { border-color: var(--success); box-shadow: 0 0 40px rgba(0,255,157,0.4); }
-
-    /* === Стили для прошедших распродаж === */
-    .past {
-      opacity: 0.65;
+    /* CURRENT EVENT BAR */
+    .event-bar {
+      margin: 2.5rem auto 0;
+      max-width: 680px;
+      background: var(--card);
+      border: 1px solid var(--border-active);
+      border-radius: 16px;
+      padding: 1.2rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
     }
-    .past td {
+    .event-bar.active {
+      border-color: rgba(45,224,140,0.4);
+      background: linear-gradient(135deg, #0f2a1a 0%, #141b2a 100%);
+    }
+    .event-name {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    .event-status {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--green);
+      background: rgba(45,224,140,0.1);
+      border: 1px solid rgba(45,224,140,0.3);
+      border-radius: 20px;
+      padding: 5px 14px;
+    }
+    .live-badge::before {
+      content:'';
+      width:7px; height:7px;
+      border-radius:50%;
+      background: var(--green);
+      animation: blink 1.2s infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+    .next-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(77,166,255,0.1);
+      border: 1px solid rgba(77,166,255,0.25);
+      border-radius: 20px;
+      padding: 5px 14px;
+    }
+
+    /* TIMER */
+    .timer-wrap {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      margin: 3rem auto;
+      max-width: 700px;
+      padding: 0 1rem;
+    }
+    .timer-unit {
+      flex: 1;
+      text-align: center;
+      position: relative;
+    }
+    .timer-unit + .timer-unit::before {
+      content: ':';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translate(-50%, -65%);
+      font-family: 'Space Mono', monospace;
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--muted);
+      line-height: 1;
+    }
+    .timer-num {
+      font-family: 'Space Mono', monospace;
+      font-size: clamp(3rem, 10vw, 6rem);
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.04em;
+      line-height: 1;
+      transition: color 0.3s;
+    }
+    .timer-num.active { color: var(--green); }
+    .timer-lbl {
+      display: block;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 0.6rem;
+    }
+
+    /* SALES TABLE */
+    .sales-section {
+      max-width: 800px;
+      margin: 0 auto 5rem;
+      padding: 0 1.5rem;
+    }
+    .section-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .sale-card {
+      display: grid;
+      grid-template-columns: 40px 1fr auto;
+      align-items: center;
+      gap: 1.2rem;
+      padding: 1.3rem 1.5rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      margin-bottom: 10px;
+      transition: border-color 0.2s, background 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .sale-card::before {
+      content:'';
+      position:absolute;
+      left:0; top:0; bottom:0;
+      width:3px;
+      background: transparent;
+      transition: background 0.2s;
+    }
+    .sale-card.upcoming::before { background: var(--accent); }
+    .sale-card.active-card::before { background: var(--green); }
+    .sale-card.past-card {
+      opacity: 0.35;
+      background: var(--past);
+    }
+    .sale-card:not(.past-card):hover {
+      border-color: var(--border-active);
+    }
+
+    .sale-num {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-align: center;
+    }
+    .sale-name {
+      font-weight: 600;
+      font-size: 0.98rem;
+      color: var(--text);
+      margin-bottom: 3px;
+    }
+    .sale-desc {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-weight: 300;
+    }
+    .sale-date {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-align: right;
+      white-space: nowrap;
+    }
+    .sale-date strong {
+      display: block;
+      color: var(--text);
+      font-size: 0.82rem;
+      margin-bottom: 2px;
+    }
+    .past-card .sale-name,
+    .past-card .sale-desc,
+    .past-card .sale-date,
+    .past-card .sale-date strong {
       text-decoration: line-through;
-      color: #aaaaaa;
-    }
-    .past td:first-child {
-      color: #ff5555;
+      color: var(--past-text);
     }
 
-    .sales-list { 
-      width: 92%; max-width: 920px; margin: 3rem auto 5rem; padding: 2rem;
-      background: rgba(10, 5, 40, 0.4); backdrop-filter: blur(20px);
-      border-radius: 24px; border: 1px solid rgba(0,240,255,0.2);
-      box-shadow: 0 20px 80px rgba(0,0,0,0.6); position: relative; z-index: 2;
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 1rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
     }
-    .sales-list h2 { text-align: center; margin-bottom: 2rem; color: #00f0ff; text-shadow: 0 0 20px #00f0ff; }
-
-    table { width: 100%; border-collapse: collapse; font-size: 1.15rem; }
-    th, td { padding: 1.2rem 1.5rem; text-align: left; border-bottom: 1px solid rgba(0,240,255,0.15); }
-    th { background: rgba(0,240,255,0.1); color: #ff00aa; text-transform: uppercase; letter-spacing: 1px; }
-    tr:hover { background: rgba(255,0,170,0.08); }
-
-    footer { margin-top: auto; padding: 3rem 1rem 2rem; text-align: center; opacity: 0.8; font-size: 1rem; position: relative; z-index: 2; }
-    .steam-btn {
-      display: inline-block; margin-top: 1.5rem; padding: 14px 32px;
-      background: linear-gradient(90deg, #00f0ff, #ff00aa);
-      color: #000; font-weight: bold; font-size: 1.2rem;
-      border-radius: 50px; text-decoration: none; transition: 0.3s;
+    .steam-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 1rem;
+      padding: 10px 22px;
+      background: rgba(77,166,255,0.1);
+      border: 1px solid rgba(77,166,255,0.3);
+      border-radius: 8px;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: 0.2s;
     }
-    .steam-btn:hover { transform: scale(1.08); box-shadow: 0 0 30px #ff00aa; }
+    .steam-link:hover {
+      background: rgba(77,166,255,0.18);
+      border-color: var(--accent);
+    }
 
-    @media (max-width: 700px) {
-      h1 { font-size: 3.4rem; }
-      .number { font-size: 4rem; }
-      .block { padding: 1.3rem 2rem; min-width: 115px; }
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 2.5rem auto;
+      max-width: 800px;
+    }
+
+    @media (max-width: 540px) {
+      .hero { padding: 3rem 1rem 2rem; }
+      .event-bar { padding: 1rem 1.2rem; }
+      .sale-card { grid-template-columns: 28px 1fr; }
+      .sale-date { display: none; }
+      .timer-unit + .timer-unit::before { font-size: 2rem; }
     }
   </style>
 </head>
 <body>
 
-  <div id="particles"></div>
+<header class="hero">
+  <div class="hero-tag">Steam · 2026</div>
+  <h1>Большие<br><span>распродажи</span></h1>
+  <p class="hero-sub" id="hero-sub">Загрузка...</p>
 
-  <header>
-    <h1>Steam Распродажи 2026</h1>
-    <div class="subtitle" id="event-title">Загрузка...</div>
-    <div class="status" id="status"></div>
-  </header>
+  <div class="event-bar" id="event-bar">
+    <div>
+      <div class="event-name" id="event-name">—</div>
+      <div class="event-status" id="event-status"></div>
+    </div>
+    <div id="event-badge"></div>
+  </div>
+</header>
 
-  <div class="countdown" id="countdown"></div>
+<div class="timer-wrap" id="timer">
+  <div class="timer-unit">
+    <div class="timer-num" id="t-d">00</div>
+    <span class="timer-lbl">дней</span>
+  </div>
+  <div class="timer-unit">
+    <div class="timer-num" id="t-h">00</div>
+    <span class="timer-lbl">часов</span>
+  </div>
+  <div class="timer-unit">
+    <div class="timer-num" id="t-m">00</div>
+    <span class="timer-lbl">минут</span>
+  </div>
+  <div class="timer-unit">
+    <div class="timer-num" id="t-s">00</div>
+    <span class="timer-lbl">секунд</span>
+  </div>
+</div>
 
-  <div class="sales-list">
-    <h2>Основные распродажи Steam 2026</h2>
-    <table id="sales-table">
-      <thead>
-        <tr>
-          <th>Распродажи</th>
-          <th>Даты</th>
-          <th>Что ждать</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr data-event="spring">
-          <td>Весенний распродажи</td>
-          <td>19 — 26 марта</td>
-          <td>Первая большая — сотни хитов по минимуму</td>
-        </tr>
-        <tr data-event="summer">
-          <td>Летний распродажи</td>
-          <td>25 июня — 9 июля</td>
-          <td>Самая мощная в году — до -90%</td>
-        </tr>
-        <tr data-event="autumn">
-          <td>Осений распродажи</td>
-          <td>1 — 8 октября</td>
-          <td>Хорошие скидки + много новинок</td>
-        </tr>
-        <tr data-event="winter">
-          <td>Зимний распродажи</td>
-          <td>17 декабря — 4 января 2027</td>
-          <td>Новогодний взрыв — максимальные скидки</td>
-        </tr>
-      </tbody>
-    </table>
+<div class="divider"></div>
+
+<section class="sales-section">
+  <div class="section-label">Расписание на 2026 год</div>
+
+  <div class="sale-card" id="card-spring">
+    <div class="sale-num">01</div>
+    <div>
+      <div class="sale-name">Весенняя распродажа</div>
+      <div class="sale-desc">Первая большая — сотни хитов по минимуму</div>
+    </div>
+    <div class="sale-date"><strong>19 — 26 марта</strong>17 UTC</div>
   </div>
 
-  <footer>
-    Обновляется в реальном времени • <a href="https://store.steampowered.com/" target="_blank" class="steam-btn">Перейти в Steam</a><br>
-    Удачных покупок! 🎮💸
-  </footer>
+  <div class="sale-card" id="card-summer">
+    <div class="sale-num">02</div>
+    <div>
+      <div class="sale-name">Летняя распродажа</div>
+      <div class="sale-desc">Самая мощная в году — до −90%</div>
+    </div>
+    <div class="sale-date"><strong>25 июня — 9 июля</strong>17 UTC</div>
+  </div>
 
-  <script>
-    // Частицы
-    function createParticles() {
-      const container = document.getElementById('particles');
-      for (let i = 0; i < 60; i++) {
-        const p = document.createElement('div');
-        p.className = 'particle';
-        const size = Math.random() * 4 + 2;
-        p.style.width = p.style.height = size + 'px';
-        p.style.left = Math.random() * 100 + 'vw';
-        p.style.animationDuration = (Math.random() * 20 + 15) + 's';
-        p.style.animationDelay = Math.random() * 10 + 's';
-        container.appendChild(p);
-      }
-    }
-    createParticles();
+  <div class="sale-card" id="card-autumn">
+    <div class="sale-num">03</div>
+    <div>
+      <div class="sale-name">Осенняя распродажа</div>
+      <div class="sale-desc">Хорошие скидки + много новинок</div>
+    </div>
+    <div class="sale-date"><strong>1 — 8 октября</strong>17 UTC</div>
+  </div>
 
-    // Основные распродажи
-    const events = [
-      { id: "spring",  name: "Весенний распродажи", start: new Date("2026-03-19T17:00:00Z").getTime(), end: new Date("2026-03-26T17:00:00Z").getTime() },
-      { id: "summer",  name: "Летний распродажи",   start: new Date("2026-06-25T17:00:00Z").getTime(), end: new Date("2026-07-09T17:00:00Z").getTime() },
-      { id: "autumn",  name: "Осений распродажи",  start: new Date("2026-10-01T17:00:00Z").getTime(), end: new Date("2026-10-08T17:00:00Z").getTime() },
-      { id: "winter",  name: "Зимний распродажи",   start: new Date("2026-12-17T17:00:00Z").getTime(), end: new Date("2027-01-04T17:00:00Z").getTime() }
-    ];
+  <div class="sale-card" id="card-winter">
+    <div class="sale-num">04</div>
+    <div>
+      <div class="sale-name">Зимняя распродажа</div>
+      <div class="sale-desc">Новогодний взрыв — максимальные скидки</div>
+    </div>
+    <div class="sale-date"><strong>17 дек — 4 янв 2027</strong>17 UTC</div>
+  </div>
+</section>
 
-    function getCurrentOrNextEvent(now) {
-      for (let event of events) {
-        if (now < event.end) return event;
-      }
-      return null;
-    }
+<footer>
+  <div>Обновляется в реальном времени</div>
+  <a href="https://store.steampowered.com/" target="_blank" class="steam-link">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+    Открыть Steam
+  </a>
+</footer>
 
-    function updateTable(now) {
-      const rows = document.querySelectorAll('#sales-table tbody tr');
-      
-      rows.forEach(row => {
-        const eventId = row.getAttribute('data-event');
-        const event = events.find(e => e.id === eventId);
-        
-        if (event && now > event.end) {
-          row.classList.add('past');
-        } else {
-          row.classList.remove('past');
-        }
+<script>
+  const events = [
+    { id:"spring", name:"Весенняя распродажа", start: Date.UTC(2026,2,19,17), end: Date.UTC(2026,2,26,17) },
+    { id:"summer", name:"Летняя распродажа",   start: Date.UTC(2026,5,25,17), end: Date.UTC(2026,6,9,17)  },
+    { id:"autumn", name:"Осенняя распродажа",  start: Date.UTC(2026,9,1,17),  end: Date.UTC(2026,9,8,17)  },
+    { id:"winter", name:"Зимняя распродажа",   start: Date.UTC(2026,11,17,17),end: Date.UTC(2027,0,4,17)  }
+  ];
+
+  const pad = n => String(n).padStart(2,'0');
+
+  function getTarget(now) {
+    for (const e of events) if (now < e.end) return e;
+    return null;
+  }
+
+  function tick() {
+    const now = Date.now();
+    const evt = getTarget(now);
+
+    // Update cards
+    events.forEach(e => {
+      const card = document.getElementById('card-' + e.id);
+      card.classList.remove('past-card','active-card','upcoming');
+      if (now > e.end) card.classList.add('past-card');
+      else if (now >= e.start) card.classList.add('active-card');
+      else card.classList.add('upcoming');
+    });
+
+    if (!evt) {
+      document.getElementById('hero-sub').textContent = 'Все распродажи 2026 завершились';
+      document.getElementById('event-name').textContent = 'Ждём расписание 2027';
+      document.getElementById('event-status').textContent = '';
+      document.getElementById('event-badge').innerHTML = '';
+      ['t-d','t-h','t-m','t-s'].forEach(id => {
+        document.getElementById(id).textContent = '00';
+        document.getElementById(id).classList.remove('active');
       });
+      return;
     }
 
-    function updateTimer() {
-      const now = Date.now();
-      const countdownEl = document.getElementById("countdown");
-      const statusEl = document.getElementById("status");
-      const titleEl = document.getElementById("event-title");
+    const isActive = now >= evt.start;
+    const diff = isActive ? evt.end - now : evt.start - now;
 
-      const currentEvent = getCurrentOrNextEvent(now);
+    const days  = Math.floor(diff / 86400000);
+    const hours = Math.floor((diff % 86400000) / 3600000);
+    const mins  = Math.floor((diff % 3600000) / 60000);
+    const secs  = Math.floor((diff % 60000) / 1000);
 
-      // Обновляем таблицу (зачёркиваем прошлые)
-      updateTable(now);
+    document.getElementById('t-d').textContent = pad(days);
+    document.getElementById('t-h').textContent = pad(hours);
+    document.getElementById('t-m').textContent = pad(mins);
+    document.getElementById('t-s').textContent = pad(secs);
 
-      if (!currentEvent) {
-        titleEl.textContent = "2026 год завершён";
-        statusEl.innerHTML = `<span style="color:#ff5555;">Ожидаем расписание 2027</span>`;
-        countdownEl.innerHTML = `<div style="font-size:2.8rem; color:#ff00aa; text-align:center; padding:3rem 1rem;">
-          Спасибо за 2026! 🎉<br>До новых встреч в 2027
-        </div>`;
-        return;
-      }
+    const nums = ['t-d','t-h','t-m','t-s'];
+    nums.forEach(id => {
+      const el = document.getElementById(id);
+      if (isActive) el.classList.add('active');
+      else el.classList.remove('active');
+    });
 
-      const isActive = now >= currentEvent.start && now < currentEvent.end;
-      let diff = isActive ? currentEvent.end - now : currentEvent.start - now;
+    document.getElementById('event-name').textContent = evt.name;
+    const bar = document.getElementById('event-bar');
 
-      if (isActive) {
-        titleEl.textContent = `${currentEvent.name} идёт!`;
-        statusEl.innerHTML = `<span style="color:#00ff9d; font-size:1.6rem;">🔥 РАСПРОДАЖА АКТИВНА! 🔥</span>`;
-      } else {
-        titleEl.textContent = `До ${currentEvent.name} осталось`;
-        statusEl.innerHTML = `<span style="color:#00f0ff;"></span>`;
-      }
-
-      const days    = Math.floor(diff / 86400000);
-      const hours   = Math.floor((diff % 86400000) / 3600000);
-      const minutes = Math.floor((diff % 3600000) / 60000);
-      const seconds = Math.floor((diff % 60000) / 1000);
-
-      let html = `
-        <div class="block ${isActive ? 'active-sale' : ''}">
-          <div class="number">${String(days).padStart(2, '0')}</div>
-          <div class="label">дней</div>
-        </div>
-        <div class="block ${isActive ? 'active-sale' : ''}">
-          <div class="number">${String(hours).padStart(2, '0')}</div>
-          <div class="label">часов</div>
-        </div>
-        <div class="block ${isActive ? 'active-sale' : ''}">
-          <div class="number">${String(minutes).padStart(2, '0')}</div>
-          <div class="label">минут</div>
-        </div>
-        <div class="block ${isActive ? 'active-sale' : ''}">
-          <div class="number">${String(seconds).padStart(2, '0')}</div>
-          <div class="label">секунд</div>
-        </div>
-      `;
-
-      countdownEl.innerHTML = html;
+    if (isActive) {
+      document.getElementById('hero-sub').textContent = 'До конца распродажи осталось';
+      document.getElementById('event-status').textContent = 'Скидки уже активны — время покупать';
+      document.getElementById('event-badge').innerHTML = '<span class="live-badge">Идёт сейчас</span>';
+      bar.classList.add('active');
+    } else {
+      document.getElementById('hero-sub').textContent = 'До начала следующей распродажи';
+      document.getElementById('event-status').textContent = 'Следи за датами';
+      document.getElementById('event-badge').innerHTML = '<span class="next-badge">Следующая</span>';
+      bar.classList.remove('active');
     }
+  }
 
-    setInterval(updateTimer, 1000);
-    updateTimer();
-  </script>
+  setInterval(tick, 1000);
+  tick();
+</script>
 </body>
 </html>
