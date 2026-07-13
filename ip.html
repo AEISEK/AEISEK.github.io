@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IP адрес</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%237c3aed'/><text x='50' y='68' font-family='Inter,system-ui,sans-serif' font-size='48' font-weight='800' fill='white' text-anchor='middle'>IP</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #030305;
+  overflow: hidden;
+  color: #fff;
+}
+
+canvas#particles {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+
+.shimmer-grid {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+  background-size: 50px 50px;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+}
+
+.orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(100px);
+  pointer-events: none;
+  z-index: 0;
+}
+.orb-1 {
+  width: 700px; height: 700px;
+  background: radial-gradient(circle, rgba(124,58,237,0.3), transparent 70%);
+  top: -20%; left: -15%;
+  animation: orbFloat1 25s ease-in-out infinite;
+}
+.orb-2 {
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(37,99,235,0.25), transparent 70%);
+  bottom: -20%; right: -15%;
+  animation: orbFloat2 25s ease-in-out infinite;
+}
+.orb-3 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(219,39,119,0.15), transparent 70%);
+  top: 40%; left: 50%;
+  transform: translate(-50%, -50%);
+  animation: orbFloat3 20s ease-in-out infinite;
+}
+
+@keyframes orbFloat1 {
+  0%, 100% { transform: translate(0, 0); }
+  33% { transform: translate(80px, -60px); }
+  66% { transform: translate(-40px, 80px); }
+}
+@keyframes orbFloat2 {
+  0%, 100% { transform: translate(0, 0); }
+  33% { transform: translate(-60px, -40px); }
+  66% { transform: translate(80px, 60px); }
+}
+@keyframes orbFloat3 {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.3); }
+}
+
+.wrapper {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 20px;
+  width: 100%;
+  max-width: 960px;
+}
+
+.card {
+  background: linear-gradient(160deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+  backdrop-filter: blur(80px);
+  -webkit-backdrop-filter: blur(80px);
+  border-radius: 48px;
+  padding: 48px 80px 44px;
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow:
+    0 0 150px rgba(124,58,237,0.05),
+    0 50px 120px rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+  position: relative;
+  animation: cardAppear 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+  overflow: hidden;
+  transform: perspective(2000px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-inner {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes cardAppear {
+  from { opacity: 0; transform: translateY(60px) scale(0.92) rotateX(5deg); }
+  to { opacity: 1; transform: translateY(0) scale(1) rotateX(0); }
+}
+
+.top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 36px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 16px 5px 10px;
+  border-radius: 100px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.05);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  color: rgba(255,255,255,0.35);
+  animation: fadeUp 0.6s 0.2s both;
+}
+
+.badge-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 14px rgba(34,197,94,0.6);
+  animation: dotPulse 2s ease-in-out infinite;
+}
+@keyframes dotPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}
+
+.theme-toggle {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  width: 36px; height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: rgba(255,255,255,0.35);
+  transition: all 0.3s ease;
+  font-size: 16px;
+  animation: fadeUp 0.6s 0.25s both;
+}
+.theme-toggle:hover {
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.7);
+}
+
+.ip-section {
+  margin-bottom: 8px;
+  animation: fadeUp 0.6s 0.35s both;
+}
+
+.ip-label {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.2);
+  margin-bottom: 12px;
+}
+
+.ip-display {
+  font-size: 86px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  line-height: 1;
+  background: linear-gradient(135deg, #f8fafc 0%, #a78bfa 40%, #60a5fa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-variant-numeric: tabular-nums;
+  transition: opacity 0.5s ease;
+  position: relative;
+  display: inline-block;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+  margin: 28px 0;
+  animation: fadeUp 0.6s 0.5s both;
+}
+
+.details {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  animation: fadeUp 0.6s 0.55s both;
+}
+
+.detail-item {
+  padding: 14px 8px;
+  background: rgba(255,255,255,0.02);
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.03);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+.detail-item::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(124,58,237,0.08), transparent);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.detail-item:hover {
+  background: rgba(255,255,255,0.04);
+  border-color: rgba(124,58,237,0.12);
+  transform: translateY(-2px);
+}
+.detail-item:hover::after { opacity: 1; }
+
+.detail-item > * { position: relative; z-index: 1; }
+.detail-item .label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: rgba(255,255,255,0.2);
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+.detail-item .value {
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.75);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 28px;
+  animation: fadeUp 0.6s 0.65s both;
+}
+
+.btn {
+  padding: 12px 28px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.03);
+  color: rgba(255,255,255,0.45);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.btn:hover::before { opacity: 1; }
+
+.btn-primary {
+  background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(37,99,235,0.15));
+  border-color: rgba(124,58,237,0.15);
+  color: #c4b5fd;
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, rgba(124,58,237,0.3), rgba(37,99,235,0.3));
+  border-color: rgba(124,58,237,0.35);
+  color: #fff;
+  box-shadow: 0 8px 40px rgba(124,58,237,0.15);
+  transform: translateY(-2px);
+}
+
+.btn-primary.copied {
+  background: linear-gradient(135deg, rgba(34,197,94,0.2), rgba(34,197,94,0.1));
+  border-color: rgba(34,197,94,0.25);
+  color: #4ade80;
+}
+
+.btn-secondary:hover {
+  background: rgba(255,255,255,0.07);
+  border-color: rgba(255,255,255,0.12);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn svg {
+  width: 16px; height: 16px;
+  flex-shrink: 0;
+}
+
+.error-display {
+  background: linear-gradient(135deg, #f87171, #ef4444);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 640px) {
+  .card { padding: 32px 20px 28px; border-radius: 32px; }
+  .ip-display { font-size: 44px; }
+  .details { grid-template-columns: repeat(2, 1fr); }
+  .detail-item { padding: 12px 8px; }
+  .top-row { margin-bottom: 24px; }
+  .actions { flex-direction: column; }
+  .btn { width: 100%; justify-content: center; }
+}
+</style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+<div class="shimmer-grid"></div>
+<canvas id="particles"></canvas>
+
+<div class="wrapper">
+  <div class="card" id="card">
+    <div class="card-inner">
+
+      <div class="top-row">
+        <div class="badge">
+          <span class="badge-dot"></span>
+          ONLINE
+        </div>
+        <button class="theme-toggle" id="themeToggle" title="Переключить тему">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="ip-section">
+        <div class="ip-label">Ваш IP адрес</div>
+        <div class="ip-display loading" id="ip">---.---.---.---</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="details">
+        <div class="detail-item">
+          <div class="label">Страна</div>
+          <div class="value" id="country">—</div>
+        </div>
+        <div class="detail-item">
+          <div class="label">Город</div>
+          <div class="value" id="city">—</div>
+        </div>
+        <div class="detail-item">
+          <div class="label">Провайдер</div>
+          <div class="value" id="org">—</div>
+        </div>
+        <div class="detail-item">
+          <div class="label">Часовой пояс</div>
+          <div class="value" id="timezone">—</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="copyBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Копировать
+        </button>
+        <button class="btn btn-secondary" id="refreshBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          Обновить
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const IP_APIS = [
+  'https://api.ipify.org?format=json',
+  'https://api64.ipify.org?format=json',
+  'https://ipinfo.io/json'
+];
+
+const GEO_APIS = [
+  (ip) => `https://ipapi.co/${ip}/json/`,
+  (ip) => `https://ipinfo.io/${ip}/json`
+];
+
+function setLoading(v) {
+  document.getElementById('ip').classList.toggle('loading', v);
+}
+
+async function fetchAny(list) {
+  for (const item of list) {
+    try {
+      const url = typeof item === 'function' ? item() : item;
+      const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
+      if (!res.ok) continue;
+      return await res.json();
+    } catch {}
+  }
+  return null;
+}
+
+async function getIP() {
+  setLoading(true);
+  const ipEl = document.getElementById('ip');
+  const els = ['country','city','org','timezone'].map(id => document.getElementById(id));
+  els.forEach(el => el.textContent = '—');
+
+  const data = await fetchAny(IP_APIS);
+  if (!data) {
+    setLoading(false);
+    ipEl.className = 'ip-display error-display';
+    ipEl.textContent = 'Не удалось определить IP';
+    return;
+  }
+
+  const ip = data.ip || data.IPv4 || null;
+  if (!ip) {
+    setLoading(false);
+    ipEl.className = 'ip-display error-display';
+    ipEl.textContent = 'Не удалось определить IP';
+    return;
+  }
+
+  ipEl.textContent = ip;
+  setLoading(false);
+  document.getElementById('copyBtn').dataset.ip = ip;
+
+  for (const geo of GEO_APIS) {
+    try {
+      const url = typeof geo === 'function' ? geo(ip) : geo;
+      const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
+      if (!res.ok) continue;
+      const info = await res.json();
+      const [c, cy, o, t] = els;
+      if (info.country_name || info.country) c.textContent = info.country_name || info.country;
+      if (info.city) cy.textContent = info.city;
+      if (info.org) o.textContent = info.org;
+      if (info.timezone) t.textContent = info.timezone;
+      if (info.country || info.city || info.org) break;
+    } catch {}
+  }
+}
+
+document.getElementById('copyBtn').addEventListener('click', function() {
+  const ip = this.dataset.ip;
+  if (!ip) return;
+  navigator.clipboard.writeText(ip).then(() => {
+    this.querySelector('svg').outerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><polyline points="20 6 9 17 4 12"/></svg>`;
+    const span = this.querySelector('span') || (() => { const s = document.createElement('span'); this.appendChild(s); return s; })();
+    this.classList.add('copied');
+    const t = this;
+    setTimeout(() => {
+      t.querySelector('svg').outerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+      t.classList.remove('copied');
+    }, 2000);
+  });
+});
+
+document.getElementById('refreshBtn').addEventListener('click', getIP);
+
+// Subtle tilt
+const card = document.getElementById('card');
+card.addEventListener('mousemove', (e) => {
+  const r = card.getBoundingClientRect();
+  const x = (e.clientX - r.left) / r.width - 0.5;
+  const y = (e.clientY - r.top) / r.height - 0.5;
+  card.style.setProperty('--rx', `${-y * 3}deg`);
+  card.style.setProperty('--ry', `${x * 3}deg`);
+});
+card.addEventListener('mouseleave', () => {
+  card.style.setProperty('--rx', '0deg');
+  card.style.setProperty('--ry', '0deg');
+});
+
+// Theme toggle
+let dark = true;
+document.getElementById('themeToggle').addEventListener('click', () => {
+  dark = !dark;
+  document.body.style.transition = 'background 0.5s ease';
+  if (dark) {
+    document.body.style.background = '#030305';
+    document.querySelector('.card').style.background = 'linear-gradient(160deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))';
+  } else {
+    document.body.style.background = '#f1f5f9';
+    document.querySelector('.card').style.background = 'rgba(255,255,255,0.7)';
+    document.querySelector('.card').style.borderColor = 'rgba(0,0,0,0.06)';
+  }
+});
+
+// Particles
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+resize();
+window.addEventListener('resize', resize);
+
+class Particle {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.speed = 0.1 + Math.random() * 0.25;
+    this.angle = Math.random() * Math.PI * 2;
+    this.size = 1 + Math.random() * 2;
+    this.opacity = 0.15 + Math.random() * 0.35;
+    this.hue = 260 + Math.random() * 40;
+  }
+  update() {
+    this.x += Math.cos(this.angle) * this.speed;
+    this.y += Math.sin(this.angle) * this.speed;
+    if (this.x < -50 || this.x > canvas.width + 50 || this.y < -50 || this.y > canvas.height + 50) this.reset();
+  }
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fillStyle = `hsla(${this.hue}, 70%, 70%, ${this.opacity})`;
+    ctx.fill();
+  }
+}
+
+for (let i = 0; i < 80; i++) particles.push(new Particle());
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => { p.update(); p.draw(); });
+
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x;
+      const dy = particles[i].y - particles[j].y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 140) {
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.strokeStyle = `rgba(124,58,237,${0.04 * (1 - dist / 140)})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    }
+  }
+  requestAnimationFrame(animate);
+}
+animate();
+
+getIP();
+</script>
+</body>
+</html>
