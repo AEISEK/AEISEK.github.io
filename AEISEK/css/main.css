@@ -747,7 +747,7 @@ body{
 .layer{
     width:100%;
     height:100%;
-    background-image:url(../../assets/images/ds.jpg);
+    background-image:url(../images/ds.jpg);
     background-size:cover;
     background-position:center
 }
