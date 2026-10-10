@@ -186,7 +186,7 @@
         <!-- Quick Presets Carousel -->
         <div class="presets-section">
           <div class="section-subheading">Быстрый выбор времени</div>
-          <div class="presets-grid">
+          <div class="presets-grid" id="presetsGrid">
             <button class="preset-card" data-seconds="60" data-label="1 минута">
               <span class="preset-duration">1 мин</span>
               <span class="preset-name">Экспресс</span>
@@ -206,6 +206,10 @@
             <button class="preset-card active" data-seconds="1500" data-label="Фокусная сессия">
               <span class="preset-duration">25 мин</span>
               <span class="preset-name">Помодоро</span>
+            </button>
+            <button class="preset-card" data-seconds="1800" data-label="Получасовой блок">
+              <span class="preset-duration">30 мин</span>
+              <span class="preset-name">Получас</span>
             </button>
             <button class="preset-card" data-seconds="2700" data-label="Глубокая работа">
               <span class="preset-duration">45 мин</span>
@@ -398,18 +402,30 @@
           </div>
         </div>
 
-        <!-- Quick Quick-Sets inside Modal -->
+        <!-- Add Current Time to Quick Presets -->
+        <div class="modal-add-preset-box">
+          <label class="add-preset-label" for="newPresetNameInput">Добавить это время в «Быстрый выбор»:</label>
+          <div class="add-preset-row">
+            <input type="text" id="newPresetNameInput" class="form-input new-preset-name-input" placeholder="Название (напр. Чтение, Спорт)..." maxlength="20">
+            <button type="button" class="btn btn-secondary btn-save-preset" id="saveAsPresetBtn" title="Сохранить текущее время в быстрый выбор">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              <span>+ Пресет</span>
+            </button>
+          </div>
+          <div class="preset-feedback hidden" id="presetFeedback"></div>
+        </div>
+
+        <!-- Manage Quick Presets List -->
         <div class="modal-quick-presets">
-          <span class="quick-title">Быстрые варианты:</span>
-          <div class="quick-tags">
-            <button class="quick-tag" data-h="0" data-m="1" data-s="0">1 мин</button>
-            <button class="quick-tag" data-h="0" data-m="5" data-s="0">5 мин</button>
-            <button class="quick-tag" data-h="0" data-m="15" data-s="0">15 мин</button>
-            <button class="quick-tag" data-h="0" data-m="25" data-s="0">25 мин</button>
-            <button class="quick-tag" data-h="0" data-m="45" data-s="0">45 мин</button>
-            <button class="quick-tag" data-h="1" data-m="0" data-s="0">1 час</button>
-            <button class="quick-tag" data-h="1" data-m="30" data-s="0">1.5 часа</button>
-            <button class="quick-tag" data-h="2" data-m="0" data-s="0">2 часа</button>
+          <div class="quick-presets-header">
+            <span class="quick-title">Быстрый выбор времени (✕ — удалить):</span>
+            <button type="button" class="btn-text-link" id="resetDefaultPresetsBtn" title="Восстановить изначальные пресеты">По умолчанию</button>
+          </div>
+          <div class="quick-manage-list" id="quickManageList">
+            <!-- Dynamically populated chips with remove buttons -->
           </div>
         </div>
       </div>

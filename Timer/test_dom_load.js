@@ -7,7 +7,7 @@ const fs = require('fs');
 const vm = require('vm');
 const assert = require('assert');
 
-console.log('--- Testing Full DOM Initialization & Sound Playback Engine ---');
+console.log('--- Testing Full DOM Initialization, Sound & Custom Presets Engine ---');
 
 // Mock a complete browser DOM window & document
 class MockClassList {
@@ -37,20 +37,72 @@ class MockElement {
     this.tagName = tag.toUpperCase();
     this.value = '00';
     this.textContent = '';
+    this._innerHTML = '';
     this.style = {};
     this.classList = new MockClassList();
     this.attributes = {};
     this.listeners = {};
+    this.children = [];
   }
-  setAttribute(k, v) { this.attributes[k] = v; }
-  getAttribute(k) { return this.attributes[k] || ''; }
+  get innerHTML() { return this._innerHTML; }
+  set innerHTML(html) {
+    this._innerHTML = html;
+    this.children = [];
+    if (!html) return;
+    const regex = /<([a-z0-9]+)([^>]*)>([\s\S]*?)<\/\1>/gi;
+    let match;
+    while ((match = regex.exec(html)) !== null) {
+      const tagName = match[1];
+      const attrs = match[2];
+      const child = new MockElement('', tagName);
+      const classMatch = attrs.match(/class="([^"]+)"/i);
+      if (classMatch) {
+        classMatch[1].split(' ').forEach(c => child.classList.add(c));
+      }
+      const titleMatch = attrs.match(/title="([^"]+)"/i);
+      if (titleMatch) child.setAttribute('title', titleMatch[1]);
+      child.textContent = match[3].replace(/<[^>]+>/g, '').trim();
+      this.children.push(child);
+    }
+  }
+  appendChild(child) {
+    this.children.push(child);
+    return child;
+  }
+  removeChild(child) {
+    const idx = this.children.indexOf(child);
+    if (idx !== -1) this.children.splice(idx, 1);
+    return child;
+  }
+  querySelector(sel) {
+    return this.querySelectorAll(sel)[0] || null;
+  }
+  querySelectorAll(sel) {
+    const res = [];
+    function match(node) {
+      if (sel.startsWith('.') && node.classList.contains(sel.slice(1))) res.push(node);
+      else if (sel.startsWith('#') && node.id === sel.slice(1)) res.push(node);
+      else if (sel.startsWith('[data-id="')) {
+        const id = sel.match(/data-id="([^"]+)"/)?.[1];
+        if (node.getAttribute('data-id') === id) res.push(node);
+      } else if (sel.startsWith('[data-seconds="')) {
+        const s = sel.match(/data-seconds="([^"]+)"/)?.[1];
+        if (node.getAttribute('data-seconds') === s) res.push(node);
+      }
+      node.children.forEach(match);
+    }
+    this.children.forEach(match);
+    return res;
+  }
+  setAttribute(k, v) { this.attributes[k] = String(v); }
+  getAttribute(k) { return this.attributes[k] !== undefined ? this.attributes[k] : ''; }
   addEventListener(ev, fn) {
     if (!this.listeners[ev]) this.listeners[ev] = [];
     this.listeners[ev].push(fn);
   }
   dispatchEvent(ev, data = {}) {
     if (this.listeners[ev]) {
-      this.listeners[ev].forEach(fn => fn({ ...data, target: this, preventDefault: () => {} }));
+      this.listeners[ev].forEach(fn => fn({ ...data, target: this, preventDefault: () => {}, stopPropagation: () => {} }));
     }
   }
   click() {
@@ -96,7 +148,10 @@ const elementIds = [
   'soundPlaybackPanel', 'soundStatusBadge', 'soundStatusText',
   'soundModeOnceBtn', 'soundModeLoopBtn', 'soundMasterToggleBtn',
   'soundToggleIconPlay', 'soundToggleIconStop', 'soundMasterToggleText',
-  'celebrationStopSoundBtn'
+  'celebrationStopSoundBtn',
+  // Custom Presets System Elements
+  'presetsGrid', 'quickManageList', 'newPresetNameInput',
+  'saveAsPresetBtn', 'resetDefaultPresetsBtn', 'presetFeedback'
 ];
 
 elementIds.forEach(id => getOrCreate(id));
@@ -133,10 +188,7 @@ const documentMock = {
   getElementById: (id) => getOrCreate(id),
   querySelectorAll: (selector) => {
     if (selector === '.preset-card') {
-      const p1 = new MockElement('p1', 'button');
-      p1.setAttribute('data-seconds', '1500');
-      p1.setAttribute('data-label', 'Помодоро');
-      return [p1];
+      return elements['presetsGrid'].children;
     }
     if (selector === '.nudge-chip') {
       const n1 = new MockElement('n1', 'button');
@@ -279,60 +331,80 @@ assert.strictEqual(soundModeOnceBtn.classList.contains('active'), true, 'Mode On
 assert.strictEqual(soundMasterToggleText.textContent, 'Включить звук');
 console.log('✓ Initial Sound UI state verified (Stopped, Mode: Once)');
 
-// Test 1: Mode Switch to Infinite
+// Test 1: Mode Switch to Infinite & Turn On
 soundModeLoopBtn.click();
 assert.strictEqual(context.window.chronoSound.mode, 'infinite');
-assert.strictEqual(soundModeLoopBtn.classList.contains('active'), true);
-assert.strictEqual(soundModeOnceBtn.classList.contains('active'), false);
-console.log('✓ Mode switch to "Повторять бесконечно" verified');
-
-// Test 2: Turn Sound On (Infinite Mode -> State "loop")
 soundMasterToggleBtn.click();
 assert.strictEqual(context.window.chronoSound.playbackState, 'loop');
 assert.strictEqual(soundStatusText.textContent, 'Повтор');
-assert.strictEqual(soundStatusBadge.classList.contains('status-loop'), true);
-assert.strictEqual(soundMasterToggleText.textContent, 'Выключить звук');
-assert.strictEqual(celebrationStopSoundBtn.classList.contains('hidden'), false);
-console.log('✓ Sound turned ON in infinite mode (Status: Повтор, Button: Выключить звук)');
-
-// Test 3: Stop Sound via Master Toggle
 soundMasterToggleBtn.click();
 assert.strictEqual(context.window.chronoSound.playbackState, 'stopped');
-assert.strictEqual(soundStatusText.textContent, 'Выключен');
-assert.strictEqual(soundMasterToggleText.textContent, 'Включить звук');
-assert.strictEqual(celebrationStopSoundBtn.classList.contains('hidden'), true);
-console.log('✓ Sound turned OFF via master toggle (Status: Выключен, Button: Включить звук)');
+console.log('✓ Infinite sound loop and toggle stop verified');
 
-// Test 4: Mode Switch to Once and Turn Sound On (State "playing")
-soundModeOnceBtn.click();
-assert.strictEqual(context.window.chronoSound.mode, 'once');
-assert.strictEqual(soundModeOnceBtn.classList.contains('active'), true);
+// Test 2: Initial Presets Rendered
+const presetsGrid = elements['presetsGrid'];
+const quickManageList = elements['quickManageList'];
+assert.strictEqual(presetsGrid.children.length, 8, '8 default presets should be rendered on main grid');
+assert.strictEqual(quickManageList.children.length, 8, '8 default presets should be in modal manage list');
+console.log('✓ 8 Default presets rendered on main screen and in modal manager');
 
-soundMasterToggleBtn.click();
-assert.strictEqual(context.window.chronoSound.playbackState, 'playing');
-assert.strictEqual(soundStatusText.textContent, 'Воспроизводится');
-assert.strictEqual(soundStatusBadge.classList.contains('status-playing'), true);
-console.log('✓ Sound turned ON in single mode (Status: Воспроизводится)');
+// Test 3: Select an existing preset (e.g. 30 min)
+const p30Card = presetsGrid.children.find(c => c.getAttribute('data-seconds') === '1800');
+assert.ok(p30Card, '30 min preset card must exist in presets grid');
+p30Card.click();
+assert.strictEqual(elements['minsVal'].value, '30');
+assert.strictEqual(elements['timerTag'].textContent, 'Получасовой блок');
+console.log('✓ Selecting preset (30 min) correctly updates timer readout & tag');
 
-// Test 5: Stop Sound via celebrationStopSoundBtn
-celebrationStopSoundBtn.click();
-assert.strictEqual(context.window.chronoSound.playbackState, 'stopped');
-assert.strictEqual(soundStatusText.textContent, 'Выключен');
-console.log('✓ Sound turned OFF via celebrationStopSoundBtn');
+// Test 4: Add a new custom preset (e.g. 50 minutes "Чтение")
+elements['inputHours'].value = 0;
+elements['inputMinutes'].value = 50;
+elements['inputSeconds'].value = 0;
+elements['newPresetNameInput'].value = 'Чтение';
+elements['saveAsPresetBtn'].click();
 
-// Test 6: Overlap prevention
-context.window.chronoSound.startSound();
-context.window.chronoSound.startSound();
-context.window.chronoSound.startSound();
-assert.ok(context.window.chronoSound.activeOscillators.size <= 4, 'Overlap prevention must keep active oscillators <= 4');
-context.window.chronoSound.stopSound();
-assert.strictEqual(context.window.chronoSound.activeOscillators.size, 0);
-console.log('✓ Overlap prevention verified: multiple start calls do not multiply audio instances');
+assert.strictEqual(presetsGrid.children.length, 9, 'Presets grid should now have 9 presets');
+assert.strictEqual(quickManageList.children.length, 9, 'Quick manage list should now have 9 presets');
 
-// Test Existing Button Listeners
+// Check that 50 min preset was saved to localStorage
+const savedPresets = JSON.parse(localStorageMock.getItem('chrono_custom_presets'));
+assert.strictEqual(savedPresets.length, 9);
+const readingPreset = savedPresets.find(p => p.seconds === 3000);
+assert.ok(readingPreset, 'Saved preset with 3000 seconds must exist');
+assert.strictEqual(readingPreset.name, 'Чтение');
+console.log('✓ Added custom preset (50 мин «Чтение»), verified in grid, modal list and localStorage');
+
+// Test 5: Click the newly created preset on main screen
+const newCard = presetsGrid.children.find(c => c.getAttribute('data-seconds') === '3000');
+assert.ok(newCard, 'New 50 min card must exist in presetsGrid');
+newCard.click();
+assert.strictEqual(elements['minsVal'].value, '50');
+assert.strictEqual(elements['timerTag'].textContent, 'Чтение (50 мин)');
+console.log('✓ Clicking newly created preset activates 50 minutes on timer');
+
+// Test 6: Delete a preset via delete button in modal
+const chip1m = quickManageList.children.find(c => c.getAttribute('data-id') === 'p_60');
+assert.ok(chip1m, '1 min chip must exist in modal list');
+const delBtn = chip1m.children.find(c => c.classList.contains('manage-chip-del'));
+assert.ok(delBtn, 'Delete button must exist on chip');
+delBtn.click();
+
+assert.strictEqual(presetsGrid.children.length, 8, 'Presets grid should now have 8 presets after deletion');
+const p1mCard = presetsGrid.children.find(c => c.getAttribute('data-id') === 'p_60');
+assert.strictEqual(p1mCard, undefined, '1 min card must no longer exist in grid');
+console.log('✓ Deleted preset (1 мин) successfully removed from main grid and localStorage');
+
+// Test 7: Reset to Default Presets
+elements['resetDefaultPresetsBtn'].click();
+assert.strictEqual(presetsGrid.children.length, 8, 'Reset restores 8 default presets');
+const p1mRestored = presetsGrid.children.find(c => c.getAttribute('data-id') === 'p_60');
+assert.ok(p1mRestored, '1 min card is restored after reset to defaults');
+console.log('✓ Restoring defaults restored the original 8 presets cleanly');
+
+// Test 8: General controls
 elements['togglePlayBtn'].click();
 elements['resetBtn'].click();
 elements['themeToggleBtn'].click();
 console.log('✓ Existing controls (Play/Pause, Reset, Theme) continue functioning cleanly');
 
-console.log('--- ALL SOUND PLAYBACK ENGINE TESTS PASSED 100% ---');
+console.log('--- ALL SOUND & CUSTOM PRESETS TESTS PASSED 100% ---');

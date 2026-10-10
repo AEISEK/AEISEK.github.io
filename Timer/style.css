@@ -1099,7 +1099,9 @@ kbd {
 
 .modal-card {
   width: 100%;
-  max-width: 440px;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
   background: var(--bg-primary);
   border: 1px solid var(--border-hover);
   border-radius: var(--radius-lg);
@@ -1218,10 +1220,85 @@ kbd {
   margin-top: 1.5rem;
 }
 
+/* Add Preset Box */
+.modal-add-preset-box {
+  margin-top: 1.15rem;
+  margin-bottom: 1.15rem;
+  padding: 0.85rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+}
+
+.add-preset-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  margin-bottom: 0.45rem;
+  display: block;
+}
+
+.add-preset-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.new-preset-name-input {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-main);
+  outline: none;
+  font-family: inherit;
+  transition: border-color var(--transition-fast);
+}
+
+.new-preset-name-input:focus {
+  border-color: var(--accent-mid);
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+
+.btn-save-preset {
+  white-space: nowrap;
+  padding: 0.5rem 0.85rem;
+  font-size: 0.82rem;
+  gap: 0.35rem;
+}
+
+.preset-feedback {
+  font-size: 0.78rem;
+  margin-top: 0.45rem;
+  font-weight: 500;
+}
+
+.preset-feedback.feedback-success {
+  color: #10b981;
+}
+
+.preset-feedback.feedback-error {
+  color: #ef4444;
+}
+
+.preset-feedback.feedback-info {
+  color: var(--accent-mid);
+}
+
+/* Manage Quick Presets List */
 .modal-quick-presets {
   border-top: 1px solid var(--border-subtle);
-  padding-top: 1.25rem;
+  padding-top: 1.15rem;
   margin-bottom: 1.5rem;
+}
+
+.quick-presets-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.65rem;
 }
 
 .quick-title {
@@ -1229,30 +1306,103 @@ kbd {
   font-weight: 600;
   color: var(--text-dim);
   display: block;
-  margin-bottom: 0.65rem;
 }
 
-.quick-tags {
+.btn-text-link {
+  background: none;
+  border: none;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  font-family: inherit;
+  transition: color var(--transition-fast);
+}
+
+.btn-text-link:hover {
+  color: var(--accent-mid);
+}
+
+.quick-manage-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.45rem;
+  gap: 0.5rem;
+  max-height: 180px;
+  overflow-y: auto;
+  padding: 2px;
 }
 
-.quick-tag {
-  padding: 0.3rem 0.65rem;
-  border-radius: 6px;
-  font-size: 0.8rem;
+.quick-manage-chip {
+  display: inline-flex;
+  align-items: stretch;
   background: var(--chip-bg);
   border: 1px solid var(--border-subtle);
-  color: var(--text-muted);
-  cursor: pointer;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
   transition: all var(--transition-fast);
 }
 
-.quick-tag:hover {
-  background: var(--btn-secondary-hover);
-  color: var(--text-main);
+.quick-manage-chip:hover {
   border-color: var(--border-hover);
+  background: var(--btn-secondary-hover);
+}
+
+.manage-chip-btn {
+  background: none;
+  border: none;
+  color: var(--text-main);
+  font-size: 0.8rem;
+  padding: 0.4rem 0.6rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: inherit;
+  transition: color var(--transition-fast);
+}
+
+.manage-chip-btn:hover {
+  color: var(--accent-mid);
+}
+
+.chip-duration {
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+
+.chip-name {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+}
+
+.manage-chip-del {
+  background: none;
+  border: none;
+  border-left: 1px solid var(--border-subtle);
+  color: var(--text-dim);
+  padding: 0 0.5rem;
+  cursor: pointer;
+  font-size: 0.82rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.manage-chip-del:hover {
+  background: rgba(239, 68, 68, 0.18);
+  color: #ef4444;
+}
+
+.presets-empty-hint {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  padding: 0.6rem;
+  text-align: center;
+  width: 100%;
+  font-style: italic;
 }
 
 .modal-footer {

@@ -51,7 +51,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const playBtnText = document.getElementById('playBtnText');
   const resetBtn = document.getElementById('resetBtn');
   const openPickerBtn = document.getElementById('openPickerBtn');
-  const presetCards = document.querySelectorAll('.preset-card');
+  const presetsGrid = document.getElementById('presetsGrid');
+  const quickManageList = document.getElementById('quickManageList');
+  const newPresetNameInput = document.getElementById('newPresetNameInput');
+  const saveAsPresetBtn = document.getElementById('saveAsPresetBtn');
+  const resetDefaultPresetsBtn = document.getElementById('resetDefaultPresetsBtn');
+  const presetFeedback = document.getElementById('presetFeedback');
   const nudgeChips = document.querySelectorAll('.nudge-chip');
   const linearProgressBar = document.getElementById('linearProgressBar');
   const brandIconEl = document.querySelector('.brand-icon');
@@ -469,7 +474,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (total > 0) {
       state.totalSeconds = total;
       state.remainingSeconds = total;
-      presetCards.forEach(c => c.classList.remove('active'));
+      clearActivePresetHighlights();
     } else {
       // Prevent invalid 00:00:00 timer - default to 1 min
       h = 0;
@@ -572,25 +577,216 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { passive: false });
   });
 
-  // --- Presets Click ---
-  presetCards.forEach(card => {
-    card.addEventListener('click', () => {
-      const sec = parseInt(card.getAttribute('data-seconds'), 10);
-      const label = card.getAttribute('data-label');
+  // --- Presets Data & Storage ---
+  const DEFAULT_PRESETS = Object.freeze([
+    { id: 'p_60', seconds: 60, name: 'Экспресс', label: '1 минута' },
+    { id: 'p_300', seconds: 300, name: 'Перерыв', label: 'Короткий перерыв' },
+    { id: 'p_600', seconds: 600, name: 'Разминка', label: 'Разминка' },
+    { id: 'p_900', seconds: 900, name: 'Стендап', label: 'Брифинг' },
+    { id: 'p_1500', seconds: 1500, name: 'Помодоро', label: 'Фокусная сессия' },
+    { id: 'p_1800', seconds: 1800, name: 'Получас', label: 'Получасовой блок' },
+    { id: 'p_2700', seconds: 2700, name: 'Спринт', label: 'Глубокая работа' },
+    { id: 'p_3600', seconds: 3600, name: 'Занятие', label: 'Часовой блок' }
+  ]);
 
-      presetCards.forEach(c => c.classList.remove('active'));
-      card.classList.add('active');
+  let customPresets = [];
+  try {
+    const saved = localStorage.getItem('chrono_custom_presets');
+    if (saved) {
+      customPresets = JSON.parse(saved);
+    }
+  } catch (err) {
+    console.warn('Failed to parse custom presets:', err);
+  }
 
-      pauseDurationTimer();
-      state.totalSeconds = sec;
-      state.remainingSeconds = sec;
-      if (label) {
-        state.taskName = label;
-        timerTag.textContent = label;
+  if (!Array.isArray(customPresets) || customPresets.length === 0) {
+    customPresets = DEFAULT_PRESETS.map(p => ({ ...p }));
+  }
+
+  function saveCustomPresets() {
+    try {
+      localStorage.setItem('chrono_custom_presets', JSON.stringify(customPresets));
+    } catch (err) {
+      console.warn('Failed to save presets:', err);
+    }
+  }
+
+  function formatPresetBadge(sec) {
+    if (sec < 60) return `${sec} сек`;
+    if (sec % 3600 === 0) return `${sec / 3600} ч`;
+    if (sec < 3600 && sec % 60 === 0) return `${sec / 60} мин`;
+    const h = Math.floor(sec / 3600);
+    const m = Math.floor((sec % 3600) / 60);
+    const s = sec % 60;
+    if (h > 0) return `${h}ч ${m > 0 ? m + 'м' : ''}`.trim();
+    return `${m}м ${s > 0 ? s + 'с' : ''}`.trim();
+  }
+
+  function clearActivePresetHighlights() {
+    if (presetsGrid) {
+      presetsGrid.querySelectorAll('.preset-card').forEach(c => c.classList.remove('active'));
+    }
+  }
+
+  function renderPresets() {
+    // 1. Render Main Screen Presets Grid
+    if (presetsGrid) {
+      presetsGrid.innerHTML = '';
+      if (customPresets.length === 0) {
+        presetsGrid.innerHTML = '<div class="presets-empty-hint">Нет сохранённых пресетов. Добавьте свои через «Настроить».</div>';
+      } else {
+        customPresets.forEach(preset => {
+          const card = document.createElement('button');
+          card.type = 'button';
+          card.className = 'preset-card';
+          if (state.totalSeconds === preset.seconds && state.remainingSeconds === preset.seconds) {
+            card.classList.add('active');
+          }
+          card.setAttribute('data-id', preset.id);
+          card.setAttribute('data-seconds', preset.seconds);
+          card.setAttribute('data-label', preset.label || preset.name);
+          card.title = preset.label || preset.name;
+
+          card.innerHTML = `
+            <span class="preset-duration">${formatPresetBadge(preset.seconds)}</span>
+            <span class="preset-name">${preset.name}</span>
+          `;
+
+          card.addEventListener('click', () => {
+            selectPreset(preset);
+          });
+
+          presetsGrid.appendChild(card);
+        });
       }
-      updateDurationDisplay(true);
-    });
-  });
+    }
+
+    // 2. Render Modal Manage List
+    if (quickManageList) {
+      quickManageList.innerHTML = '';
+      if (customPresets.length === 0) {
+        quickManageList.innerHTML = '<div class="presets-empty-hint">Список пуст. Выберите время на стрелках и нажмите «+ Пресет».</div>';
+      } else {
+        customPresets.forEach(preset => {
+          const chip = document.createElement('div');
+          chip.className = 'quick-manage-chip';
+          chip.setAttribute('data-id', preset.id);
+
+          const hrs = Math.floor(preset.seconds / 3600);
+          const mins = Math.floor((preset.seconds % 3600) / 60);
+          const secs = preset.seconds % 60;
+
+          chip.innerHTML = `
+            <button type="button" class="manage-chip-btn" title="Подставить ${formatPresetBadge(preset.seconds)} в стрелки">
+              <span class="chip-duration">${formatPresetBadge(preset.seconds)}</span>
+              <span class="chip-name">${preset.name}</span>
+            </button>
+            <button type="button" class="manage-chip-del" title="Удалить пресет «${preset.name}»" aria-label="Удалить">✕</button>
+          `;
+
+          const btnSelect = chip.querySelector('.manage-chip-btn');
+          const btnDel = chip.querySelector('.manage-chip-del');
+
+          btnSelect.addEventListener('click', () => {
+            inputHours.value = hrs;
+            inputMinutes.value = mins;
+            inputSeconds.value = secs;
+            if (newPresetNameInput) {
+              newPresetNameInput.value = preset.name;
+            }
+          });
+
+          btnDel.addEventListener('click', (e) => {
+            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+            deletePreset(preset.id);
+          });
+
+          quickManageList.appendChild(chip);
+        });
+      }
+    }
+  }
+
+  function selectPreset(preset) {
+    if (presetsGrid) {
+      presetsGrid.querySelectorAll('.preset-card').forEach(c => c.classList.remove('active'));
+      const activeCard = presetsGrid.querySelector(`.preset-card[data-id="${preset.id}"]`);
+      if (activeCard) activeCard.classList.add('active');
+    }
+
+    pauseDurationTimer();
+    state.totalSeconds = preset.seconds;
+    state.remainingSeconds = preset.seconds;
+    if (preset.label || preset.name) {
+      state.taskName = preset.label || preset.name;
+      timerTag.textContent = preset.label || preset.name;
+    }
+    updateDurationDisplay(true);
+  }
+
+  function deletePreset(id) {
+    const idx = customPresets.findIndex(p => p.id === id);
+    if (idx !== -1) {
+      const removed = customPresets.splice(idx, 1)[0];
+      saveCustomPresets();
+      renderPresets();
+      showPresetFeedback(`Пресет «${removed.name}» удалён`, 'info');
+    }
+  }
+
+  function addPreset(seconds, name) {
+    if (seconds <= 0) {
+      showPresetFeedback('Укажите время больше 0 сек', 'error');
+      return false;
+    }
+
+    const trimmedName = (name || '').trim();
+    const finalName = trimmedName || formatPresetBadge(seconds);
+    const finalLabel = trimmedName ? `${trimmedName} (${formatPresetBadge(seconds)})` : formatHumanDuration(seconds);
+
+    // If preset with exact same seconds exists, update it
+    const existing = customPresets.find(p => p.seconds === seconds);
+    if (existing) {
+      existing.name = finalName;
+      existing.label = finalLabel;
+      showPresetFeedback(`Пресет на ${formatPresetBadge(seconds)} обновлён на «${finalName}»!`, 'success');
+    } else {
+      const newPreset = {
+        id: `p_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+        seconds: seconds,
+        name: finalName,
+        label: finalLabel
+      };
+      customPresets.push(newPreset);
+      customPresets.sort((a, b) => a.seconds - b.seconds);
+      showPresetFeedback(`✓ Пресет «${finalName}» добавлен в быстрый выбор!`, 'success');
+    }
+
+    saveCustomPresets();
+    renderPresets();
+    if (newPresetNameInput) {
+      newPresetNameInput.value = '';
+    }
+    return true;
+  }
+
+  function restoreDefaultPresets() {
+    customPresets = DEFAULT_PRESETS.map(p => ({ ...p }));
+    saveCustomPresets();
+    renderPresets();
+    showPresetFeedback('✓ Стандартные пресеты восстановлены', 'success');
+  }
+
+  let feedbackTimer = null;
+  function showPresetFeedback(msg, type = 'success') {
+    if (!presetFeedback) return;
+    clearTimeout(feedbackTimer);
+    presetFeedback.textContent = msg;
+    presetFeedback.className = `preset-feedback feedback-${type}`;
+    feedbackTimer = setTimeout(() => {
+      presetFeedback.className = 'preset-feedback hidden';
+    }, 3000);
+  }
 
   // --- Custom Time Picker Modal ---
   function openPicker() {
@@ -629,8 +825,7 @@ document.addEventListener('DOMContentLoaded', () => {
     state.totalSeconds = total;
     state.remainingSeconds = total;
     
-    // Clear active preset highlight
-    presetCards.forEach(c => c.classList.remove('active'));
+    clearActivePresetHighlights();
 
     updateDurationDisplay(true);
     closePicker();
@@ -665,13 +860,32 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  modalQuickTags.forEach(tag => {
-    tag.addEventListener('click', () => {
-      inputHours.value = tag.getAttribute('data-h');
-      inputMinutes.value = tag.getAttribute('data-m');
-      inputSeconds.value = tag.getAttribute('data-s');
+  // Save current stepper time as preset
+  if (saveAsPresetBtn) {
+    saveAsPresetBtn.addEventListener('click', () => {
+      const h = parseInt(inputHours.value, 10) || 0;
+      const m = parseInt(inputMinutes.value, 10) || 0;
+      const s = parseInt(inputSeconds.value, 10) || 0;
+      const totalSec = h * 3600 + m * 60 + s;
+      const name = newPresetNameInput ? newPresetNameInput.value : '';
+      addPreset(totalSec, name);
     });
-  });
+  }
+
+  if (newPresetNameInput) {
+    newPresetNameInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (saveAsPresetBtn) saveAsPresetBtn.click();
+      }
+    });
+  }
+
+  if (resetDefaultPresetsBtn) {
+    resetDefaultPresetsBtn.addEventListener('click', () => {
+      restoreDefaultPresets();
+    });
+  }
 
   // --- Editable Timer Tag ---
   timerTag.addEventListener('blur', () => {
@@ -1066,6 +1280,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- Initialize Setup (after all DOM handlers & functions are registered) ---
   initTheme();
+  renderPresets();
   updateDurationDisplay(true);
   initTargetView();
   checkNotificationStatus();
