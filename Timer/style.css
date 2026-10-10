@@ -1242,11 +1242,13 @@ kbd {
   display: flex;
   gap: 0.5rem;
   align-items: center;
+  width: 100%;
 }
 
 .new-preset-name-input {
-  flex: 1;
-  padding: 0.5rem 0.75rem;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0.55rem 0.75rem;
   font-size: 0.85rem;
   background: var(--bg-primary);
   border: 1px solid var(--border-subtle);
@@ -1263,8 +1265,9 @@ kbd {
 }
 
 .btn-save-preset {
+  flex: 0 0 auto;
   white-space: nowrap;
-  padding: 0.5rem 0.85rem;
+  padding: 0.55rem 0.85rem;
   font-size: 0.82rem;
   gap: 0.35rem;
 }
@@ -1299,6 +1302,7 @@ kbd {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.65rem;
+  gap: 0.5rem;
 }
 
 .quick-title {
@@ -1309,19 +1313,24 @@ kbd {
 }
 
 .btn-text-link {
-  background: none;
-  border: none;
+  background: transparent;
+  border: 1px solid transparent;
+  outline: none;
   font-size: 0.75rem;
   color: var(--text-dim);
   cursor: pointer;
   text-decoration: underline;
-  padding: 0;
+  padding: 0.2rem 0.45rem;
   font-family: inherit;
-  transition: color var(--transition-fast);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
 }
 
 .btn-text-link:hover {
   color: var(--accent-mid);
+  background: var(--chip-bg);
+  border-color: var(--border-subtle);
 }
 
 .quick-manage-list {

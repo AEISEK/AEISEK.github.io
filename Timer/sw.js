@@ -1,30 +1,34 @@
 /**
  * TIMER PRO — Service Worker (PWA Offline Engine)
+ * Version 2.2 — Network-First for Code Assets with Offline Fallback
  */
 
-const CACHE_NAME = 'timer-pro-v1';
+const CACHE_NAME = 'timer-pro-v2-2';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './style.css',
-  './app.js',
-  './audio.js',
-  './confetti.js',
+  './style.css?v=2.2',
+  './app.js?v=2.2',
+  './audio.js?v=2.2',
+  './confetti.js?v=2.2',
   './icon.png',
   './favicon.png',
   './manifest.json'
 ];
 
-// Install: Cache critical static assets
+// Install: Cache critical static assets and skip waiting immediately
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(ASSETS_TO_CACHE);
-    }).then(() => self.skipWaiting())
+    }).catch((err) => {
+      console.warn('SW install cache error:', err);
+    })
   );
 });
 
-// Activate: Clean up outdated caches & claim clients
+// Activate: Clean up all outdated caches & immediately claim clients
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -39,30 +43,52 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch: Stale-While-Revalidate / Cache-First strategy
+// Fetch: Network-First for HTML/CSS/JS (ensures instant GitHub deploy updates)
 self.addEventListener('fetch', (event) => {
-  // Only handle GET requests
   if (event.request.method !== 'GET') return;
 
+  const url = new URL(event.request.url);
+  const isCodeAsset = url.pathname.endsWith('.html') || 
+                      url.pathname.endsWith('.js') || 
+                      url.pathname.endsWith('.css') || 
+                      url.search.includes('v=') ||
+                      event.request.mode === 'navigate';
+
+  if (isCodeAsset) {
+    // Try Network first; on failure, serve from Cache
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const clone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          }
+          return networkResponse;
+        })
+        .catch(() => {
+          return caches.match(event.request).then((cached) => {
+            if (cached) return cached;
+            if (event.request.mode === 'navigate') {
+              return caches.match('./index.html');
+            }
+          });
+        })
+    );
+    return;
+  }
+
+  // Cache-first for images, fonts, icons
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        // Fetch in background to update cache (Stale-While-Revalidate)
-        fetch(event.request).then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, networkResponse);
-            });
-          }
-        }).catch(() => {/* Offline */});
-        return cachedResponse;
-      }
-      return fetch(event.request);
+      return cachedResponse || fetch(event.request).then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
+          const clone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+        }
+        return networkResponse;
+      });
     }).catch(() => {
-      // Fallback for navigation requests
-      if (event.request.mode === 'navigate') {
-        return caches.match('./index.html');
-      }
+      // Offline fallback
     })
   );
 });
