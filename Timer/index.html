@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=2.2">
+  <link rel="stylesheet" href="style.css?v=2.3">
 </head>
 <body>
   <!-- Canvas for celebration confetti -->
@@ -187,10 +187,6 @@
         <div class="presets-section">
           <div class="section-subheading">Быстрый выбор времени</div>
           <div class="presets-grid" id="presetsGrid">
-            <button class="preset-card" data-seconds="60" data-label="1 минута">
-              <span class="preset-duration">1 мин</span>
-              <span class="preset-name">Экспресс</span>
-            </button>
             <button class="preset-card" data-seconds="300" data-label="Короткий перерыв">
               <span class="preset-duration">5 мин</span>
               <span class="preset-name">Перерыв</span>
@@ -425,7 +421,6 @@
             <button type="button" class="btn-text-link" id="resetDefaultPresetsBtn" title="Восстановить изначальные пресеты">По умолчанию</button>
           </div>
           <div class="quick-manage-list" id="quickManageList">
-            <div class="quick-manage-chip" data-id="p_60"><button type="button" class="manage-chip-btn"><span class="chip-duration">1 мин</span><span class="chip-name">Экспресс</span></button><button type="button" class="manage-chip-del">✕</button></div>
             <div class="quick-manage-chip" data-id="p_300"><button type="button" class="manage-chip-btn"><span class="chip-duration">5 мин</span><span class="chip-name">Перерыв</span></button><button type="button" class="manage-chip-del">✕</button></div>
             <div class="quick-manage-chip" data-id="p_600"><button type="button" class="manage-chip-btn"><span class="chip-duration">10 мин</span><span class="chip-name">Разминка</span></button><button type="button" class="manage-chip-del">✕</button></div>
             <div class="quick-manage-chip" data-id="p_900"><button type="button" class="manage-chip-btn"><span class="chip-duration">15 мин</span><span class="chip-name">Стендап</span></button><button type="button" class="manage-chip-del">✕</button></div>
@@ -474,8 +469,8 @@
   </div>
 
   <!-- Scripts -->
-  <script src="audio.js?v=2.2"></script>
-  <script src="confetti.js?v=2.2"></script>
-  <script src="app.js?v=2.2"></script>
+  <script src="audio.js?v=2.3"></script>
+  <script src="confetti.js?v=2.3"></script>
+  <script src="app.js?v=2.3"></script>
 </body>
 </html>

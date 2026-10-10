@@ -579,7 +579,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- Presets Data & Storage ---
   const DEFAULT_PRESETS = Object.freeze([
-    { id: 'p_60', seconds: 60, name: 'Экспресс', label: '1 минута' },
     { id: 'p_300', seconds: 300, name: 'Перерыв', label: 'Короткий перерыв' },
     { id: 'p_600', seconds: 600, name: 'Разминка', label: 'Разминка' },
     { id: 'p_900', seconds: 900, name: 'Стендап', label: 'Брифинг' },
@@ -594,6 +593,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const saved = localStorage.getItem('chrono_custom_presets');
     if (saved) {
       customPresets = JSON.parse(saved);
+      if (Array.isArray(customPresets)) {
+        // Remove 1-min preset if user still has it cached
+        customPresets = customPresets.filter(p => p.id !== 'p_60' && p.seconds !== 60);
+      }
     }
   } catch (err) {
     console.warn('Failed to parse custom presets:', err);

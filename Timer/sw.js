@@ -1,16 +1,16 @@
 /**
  * TIMER PRO — Service Worker (PWA Offline Engine)
- * Version 2.2 — Network-First for Code Assets with Offline Fallback
+ * Version 2.3 — Network-First for Code Assets with Offline Fallback
  */
 
-const CACHE_NAME = 'timer-pro-v2-2';
+const CACHE_NAME = 'timer-pro-v2-3';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './style.css?v=2.2',
-  './app.js?v=2.2',
-  './audio.js?v=2.2',
-  './confetti.js?v=2.2',
+  './style.css?v=2.3',
+  './app.js?v=2.3',
+  './audio.js?v=2.3',
+  './confetti.js?v=2.3',
   './icon.png',
   './favicon.png',
   './manifest.json'

@@ -341,12 +341,12 @@ soundMasterToggleBtn.click();
 assert.strictEqual(context.window.chronoSound.playbackState, 'stopped');
 console.log('✓ Infinite sound loop and toggle stop verified');
 
-// Test 2: Initial Presets Rendered
+// Test 2: Initial Presets Rendered (7 default presets without 1 min)
 const presetsGrid = elements['presetsGrid'];
 const quickManageList = elements['quickManageList'];
-assert.strictEqual(presetsGrid.children.length, 8, '8 default presets should be rendered on main grid');
-assert.strictEqual(quickManageList.children.length, 8, '8 default presets should be in modal manage list');
-console.log('✓ 8 Default presets rendered on main screen and in modal manager');
+assert.strictEqual(presetsGrid.children.length, 7, '7 default presets should be rendered on main grid');
+assert.strictEqual(quickManageList.children.length, 7, '7 default presets should be in modal manage list');
+console.log('✓ 7 Default presets rendered on main screen and in modal manager (1 min removed)');
 
 // Test 3: Select an existing preset (e.g. 30 min)
 const p30Card = presetsGrid.children.find(c => c.getAttribute('data-seconds') === '1800');
@@ -363,12 +363,12 @@ elements['inputSeconds'].value = 0;
 elements['newPresetNameInput'].value = 'Чтение';
 elements['saveAsPresetBtn'].click();
 
-assert.strictEqual(presetsGrid.children.length, 9, 'Presets grid should now have 9 presets');
-assert.strictEqual(quickManageList.children.length, 9, 'Quick manage list should now have 9 presets');
+assert.strictEqual(presetsGrid.children.length, 8, 'Presets grid should now have 8 presets');
+assert.strictEqual(quickManageList.children.length, 8, 'Quick manage list should now have 8 presets');
 
 // Check that 50 min preset was saved to localStorage
 const savedPresets = JSON.parse(localStorageMock.getItem('chrono_custom_presets'));
-assert.strictEqual(savedPresets.length, 9);
+assert.strictEqual(savedPresets.length, 8);
 const readingPreset = savedPresets.find(p => p.seconds === 3000);
 assert.ok(readingPreset, 'Saved preset with 3000 seconds must exist');
 assert.strictEqual(readingPreset.name, 'Чтение');
@@ -382,24 +382,24 @@ assert.strictEqual(elements['minsVal'].value, '50');
 assert.strictEqual(elements['timerTag'].textContent, 'Чтение (50 мин)');
 console.log('✓ Clicking newly created preset activates 50 minutes on timer');
 
-// Test 6: Delete a preset via delete button in modal
-const chip1m = quickManageList.children.find(c => c.getAttribute('data-id') === 'p_60');
-assert.ok(chip1m, '1 min chip must exist in modal list');
-const delBtn = chip1m.children.find(c => c.classList.contains('manage-chip-del'));
+// Test 6: Delete a preset via delete button in modal (e.g. 5m)
+const chip5m = quickManageList.children.find(c => c.getAttribute('data-id') === 'p_300');
+assert.ok(chip5m, '5 min chip must exist in modal list');
+const delBtn = chip5m.children.find(c => c.classList.contains('manage-chip-del'));
 assert.ok(delBtn, 'Delete button must exist on chip');
 delBtn.click();
 
-assert.strictEqual(presetsGrid.children.length, 8, 'Presets grid should now have 8 presets after deletion');
-const p1mCard = presetsGrid.children.find(c => c.getAttribute('data-id') === 'p_60');
-assert.strictEqual(p1mCard, undefined, '1 min card must no longer exist in grid');
-console.log('✓ Deleted preset (1 мин) successfully removed from main grid and localStorage');
+assert.strictEqual(presetsGrid.children.length, 7, 'Presets grid should now have 7 presets after deletion');
+const p5mCard = presetsGrid.children.find(c => c.getAttribute('data-id') === 'p_300');
+assert.strictEqual(p5mCard, undefined, '5 min card must no longer exist in grid');
+console.log('✓ Deleted preset (5 мин) successfully removed from main grid and localStorage');
 
 // Test 7: Reset to Default Presets
 elements['resetDefaultPresetsBtn'].click();
-assert.strictEqual(presetsGrid.children.length, 8, 'Reset restores 8 default presets');
-const p1mRestored = presetsGrid.children.find(c => c.getAttribute('data-id') === 'p_60');
-assert.ok(p1mRestored, '1 min card is restored after reset to defaults');
-console.log('✓ Restoring defaults restored the original 8 presets cleanly');
+assert.strictEqual(presetsGrid.children.length, 7, 'Reset restores 7 default presets');
+const p5mRestored = presetsGrid.children.find(c => c.getAttribute('data-id') === 'p_300');
+assert.ok(p5mRestored, '5 min card is restored after reset to defaults');
+console.log('✓ Restoring defaults restored the 7 default presets cleanly');
 
 // Test 8: General controls
 elements['togglePlayBtn'].click();
