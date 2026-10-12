@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=2.4">
+  <link rel="stylesheet" href="style.css?v=2.5">
 </head>
 <body>
   <!-- Canvas for celebration confetti -->
@@ -69,6 +69,20 @@
             <line x1="23" y1="9" x2="17" y2="15"></line>
             <line x1="17" y1="9" x2="23" y2="15"></line>
           </svg>
+        </button>
+
+        <button class="icon-btn" id="notifyToggleBtn" title="Уведомления Chrome" aria-label="Уведомления Chrome">
+          <svg id="notifyIconOn" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          <svg id="notifyIconOff" class="hidden" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            <path d="M18.63 13A17.89 17.89 0 0 1 18 8"></path>
+            <path d="M6.26 6.26A5.86 5.86 0 0 0 6 8c0 7-3 9-3 9h14"></path>
+            <line x1="1" y1="1" x2="23" y2="23"></line>
+          </svg>
+          <span class="notify-btn-indicator" id="notifyBtnIndicator"></span>
         </button>
 
         <button class="icon-btn" id="themeToggleBtn" title="Сменить тему" aria-label="Сменить тему">
@@ -430,6 +444,46 @@
             <div class="quick-manage-chip" data-id="p_3600"><button type="button" class="manage-chip-btn"><span class="chip-duration">1 час</span><span class="chip-name">Занятие</span></button><button type="button" class="manage-chip-del">✕</button></div>
           </div>
         </div>
+
+        <!-- Chrome Notifications Settings Section -->
+        <div class="modal-notify-box">
+          <div class="notify-box-header">
+            <div class="notify-box-title-wrap">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+              <span class="notify-box-title">Уведомления в браузере (Chrome)</span>
+            </div>
+            <span class="notify-status-badge badge-warning" id="modalNotifyStatusBadge">Не настроены</span>
+          </div>
+          <p class="notify-box-desc" id="modalNotifyStatusDesc">
+            Оповещения предупредят о завершении таймера звуком и всплывающим окном, даже когда Chrome свернут.
+          </p>
+          <div class="notify-box-actions">
+            <button type="button" class="btn btn-primary btn-sm" id="modalEnableNotifyBtn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <span>Включить уведомления</span>
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" id="modalTestNotifyBtn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+              <span>Отправить тест</span>
+            </button>
+          </div>
+          <div class="notify-blocked-alert hidden" id="modalNotifyBlockedAlert">
+            <div class="alert-title">⚠️ Уведомления заблокированы в настройках Chrome</div>
+            <ol class="alert-steps">
+              <li>Нажмите на значок <strong>настроек сайта / 🔒</strong> слева от адреса в Chrome.</li>
+              <li>В строке <strong>«Уведомления»</strong> переключите на <strong>«Разрешить»</strong>.</li>
+              <li>Перезагрузите страницу для применения.</li>
+            </ol>
+          </div>
+        </div>
       </div>
 
       <div class="modal-footer">
@@ -463,14 +517,30 @@
 
   <!-- Notification Banner (Web Notifications Permission Prompt) -->
   <div class="notification-prompt hidden" id="notifyPrompt">
-    <span>Включите уведомления, чтобы не пропустить окончание таймера</span>
-    <button class="btn-xs" id="allowNotifyBtn">Включить</button>
-    <button class="close-xs" id="closeNotifyBtn">✕</button>
+    <div class="prompt-icon-wrap">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+      </svg>
+    </div>
+    <div class="prompt-text-wrap">
+      <span class="prompt-title">Включить уведомления в Chrome?</span>
+      <span class="prompt-desc">Чтобы слышать и видеть сигнал, когда окно таймера свернуто.</span>
+    </div>
+    <div class="prompt-actions-wrap">
+      <button class="btn btn-primary btn-xs" id="allowNotifyBtn">Разрешить</button>
+      <button class="btn btn-secondary btn-xs" id="closeNotifyBtn">Позже</button>
+    </div>
+  </div>
+
+  <!-- Global App Toast Notification -->
+  <div class="app-toast hidden" id="appToast">
+    <span class="toast-message" id="appToastMessage"></span>
   </div>
 
   <!-- Scripts -->
-  <script src="audio.js?v=2.4"></script>
-  <script src="confetti.js?v=2.4"></script>
-  <script src="app.js?v=2.4"></script>
+  <script src="audio.js?v=2.5"></script>
+  <script src="confetti.js?v=2.5"></script>
+  <script src="app.js?v=2.5"></script>
 </body>
 </html>

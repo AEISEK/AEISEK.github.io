@@ -106,10 +106,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const soundMasterToggleText = document.getElementById('soundMasterToggleText');
   const celebrationStopSoundBtn = document.getElementById('celebrationStopSoundBtn');
 
-  // Web Notification Prompt
+  // Web Notification & Chrome Engine DOM Elements
+  const notifyToggleBtn = document.getElementById('notifyToggleBtn');
+  const notifyIconOn = document.getElementById('notifyIconOn');
+  const notifyIconOff = document.getElementById('notifyIconOff');
+  const notifyBtnIndicator = document.getElementById('notifyBtnIndicator');
+  const modalNotifyStatusBadge = document.getElementById('modalNotifyStatusBadge');
+  const modalNotifyStatusDesc = document.getElementById('modalNotifyStatusDesc');
+  const modalEnableNotifyBtn = document.getElementById('modalEnableNotifyBtn');
+  const modalTestNotifyBtn = document.getElementById('modalTestNotifyBtn');
+  const modalNotifyBlockedAlert = document.getElementById('modalNotifyBlockedAlert');
   const notifyPrompt = document.getElementById('notifyPrompt');
   const allowNotifyBtn = document.getElementById('allowNotifyBtn');
   const closeNotifyBtn = document.getElementById('closeNotifyBtn');
+  const appToast = document.getElementById('appToast');
+  const appToastMessage = document.getElementById('appToastMessage');
 
   // --- Duration Timer Logic & Fast Lookup (Zero Allocations) ---
   const PAD_TABLE = Array.from({ length: 100 }, (_, i) => (i < 10 ? '0' + i : '' + i));
@@ -1130,35 +1141,200 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // --- Web Notification System ---
-  function checkNotificationStatus() {
-    if (!('Notification' in window)) return;
-    if (Notification.permission === 'default') {
-      setTimeout(() => {
-        notifyPrompt.classList.remove('hidden');
-      }, 3000);
+  // --- Toast Notification System ---
+  let appToastTimer = null;
+  function showToast(msg, type = 'info') {
+    if (!appToast || !appToastMessage) return;
+    clearTimeout(appToastTimer);
+    appToastMessage.textContent = msg;
+    appToast.className = `app-toast toast-${type}`;
+    appToast.classList.remove('hidden');
+
+    appToastTimer = setTimeout(() => {
+      if (appToast) appToast.classList.add('hidden');
+    }, 3800);
+  }
+
+  // --- Chrome & Web Notification Engine ---
+  function getNotificationPermission() {
+    if (!('Notification' in window)) return 'unsupported';
+    return Notification.permission;
+  }
+
+  function syncNotificationUI() {
+    const permission = getNotificationPermission();
+
+    if (permission === 'granted') {
+      if (notifyToggleBtn) {
+        notifyToggleBtn.className = 'icon-btn is-granted';
+        notifyToggleBtn.title = 'Уведомления Chrome: включены (кликните для проверки)';
+      }
+      if (notifyIconOn) notifyIconOn.classList.remove('hidden');
+      if (notifyIconOff) notifyIconOff.classList.add('hidden');
+
+      if (modalNotifyStatusBadge) {
+        modalNotifyStatusBadge.textContent = 'Включены';
+        modalNotifyStatusBadge.className = 'notify-status-badge badge-success';
+      }
+      if (modalNotifyStatusDesc) {
+        modalNotifyStatusDesc.textContent = 'Уведомления активны! Вы получите звуковой сигнал и окно на экране при завершении таймера, даже если Chrome свернут.';
+      }
+      if (modalEnableNotifyBtn) modalEnableNotifyBtn.classList.add('hidden');
+      if (modalTestNotifyBtn) modalTestNotifyBtn.classList.remove('hidden');
+      if (modalNotifyBlockedAlert) modalNotifyBlockedAlert.classList.add('hidden');
+      if (notifyPrompt) notifyPrompt.classList.add('hidden');
+
+    } else if (permission === 'denied') {
+      if (notifyToggleBtn) {
+        notifyToggleBtn.className = 'icon-btn is-denied';
+        notifyToggleBtn.title = 'Уведомления заблокированы в Chrome (кликните для инструкции)';
+      }
+      if (notifyIconOn) notifyIconOn.classList.add('hidden');
+      if (notifyIconOff) notifyIconOff.classList.remove('hidden');
+
+      if (modalNotifyStatusBadge) {
+        modalNotifyStatusBadge.textContent = 'Заблокированы';
+        modalNotifyStatusBadge.className = 'notify-status-badge badge-danger';
+      }
+      if (modalNotifyStatusDesc) {
+        modalNotifyStatusDesc.textContent = 'Уведомления заблокированы в настройках Google Chrome. Разрешите доступ в адресной строке.';
+      }
+      if (modalEnableNotifyBtn) modalEnableNotifyBtn.classList.add('hidden');
+      if (modalTestNotifyBtn) modalTestNotifyBtn.classList.add('hidden');
+      if (modalNotifyBlockedAlert) modalNotifyBlockedAlert.classList.remove('hidden');
+      if (notifyPrompt) notifyPrompt.classList.add('hidden');
+
+    } else if (permission === 'default') {
+      if (notifyToggleBtn) {
+        notifyToggleBtn.className = 'icon-btn is-default';
+        notifyToggleBtn.title = 'Включить уведомления в Chrome';
+      }
+      if (notifyIconOn) notifyIconOn.classList.remove('hidden');
+      if (notifyIconOff) notifyIconOff.classList.add('hidden');
+
+      if (modalNotifyStatusBadge) {
+        modalNotifyStatusBadge.textContent = 'Не настроены';
+        modalNotifyStatusBadge.className = 'notify-status-badge badge-warning';
+      }
+      if (modalNotifyStatusDesc) {
+        modalNotifyStatusDesc.textContent = 'Оповещения предупредят о завершении таймера звуком и всплывающим окном, даже когда Chrome свернут.';
+      }
+      if (modalEnableNotifyBtn) modalEnableNotifyBtn.classList.remove('hidden');
+      if (modalTestNotifyBtn) modalTestNotifyBtn.classList.add('hidden');
+      if (modalNotifyBlockedAlert) modalNotifyBlockedAlert.classList.add('hidden');
+
+      try {
+        const dismissed = sessionStorage.getItem('chrono_notify_prompt_dismissed');
+        if (!dismissed && notifyPrompt) {
+          setTimeout(() => {
+            if (getNotificationPermission() === 'default') {
+              notifyPrompt.classList.remove('hidden');
+            }
+          }, 2500);
+        }
+      } catch (_) {}
+    } else {
+      if (notifyToggleBtn) notifyToggleBtn.classList.add('hidden');
+      if (modalNotifyStatusBadge) {
+        modalNotifyStatusBadge.textContent = 'Не поддерживается';
+        modalNotifyStatusBadge.className = 'notify-status-badge badge-danger';
+      }
+      if (modalNotifyStatusDesc) {
+        modalNotifyStatusDesc.textContent = 'Ваш браузер не поддерживает Web Notifications.';
+      }
+      if (modalEnableNotifyBtn) modalEnableNotifyBtn.classList.add('hidden');
+      if (modalTestNotifyBtn) modalTestNotifyBtn.classList.add('hidden');
+      if (modalNotifyBlockedAlert) modalNotifyBlockedAlert.classList.add('hidden');
+      if (notifyPrompt) notifyPrompt.classList.add('hidden');
     }
   }
 
-  allowNotifyBtn.addEventListener('click', () => {
-    if ('Notification' in window) {
-      Notification.requestPermission().then(() => {
-        notifyPrompt.classList.add('hidden');
-      });
+  async function requestNotificationPermission() {
+    if (!('Notification' in window)) {
+      showToast('Уведомления не поддерживаются браузером', 'error');
+      return 'unsupported';
     }
-  });
 
-  closeNotifyBtn.addEventListener('click', () => {
-    notifyPrompt.classList.add('hidden');
-  });
+    try {
+      const result = await Notification.requestPermission();
+      syncNotificationUI();
 
-  function triggerNotification(title, body) {
-    if ('Notification' in window && Notification.permission === 'granted') {
-      try {
-        new Notification(title, { body });
-      } catch (e) {
-        console.warn('Notification error:', e);
+      if (result === 'granted') {
+        showToast('✓ Уведомления успешно включены в Chrome!', 'success');
+        triggerNotification('🔔 Уведомления включены!', 'Chrono уведомит вас о завершении таймера.', 'chrono-welcome');
+      } else if (result === 'denied') {
+        showToast('⚠️ Уведомления отклонены. Нажмите 🔒 в Chrome для разрешения.', 'error');
+        openPicker();
       }
+      return result;
+    } catch (err) {
+      console.warn('Notification permission error:', err);
+      syncNotificationUI();
+      return 'error';
+    }
+  }
+
+  async function triggerNotification(title, body, tag = 'chrono-timer-finished') {
+    if (!('Notification' in window) || Notification.permission !== 'granted') {
+      return false;
+    }
+
+    const options = {
+      body: body || 'Ваш таймер успешно завершен.',
+      icon: 'icon.png',
+      badge: 'icon.png',
+      tag: tag,
+      renotify: true,
+      requireInteraction: true,
+      silent: false,
+      vibrate: [200, 100, 200, 100, 200],
+      data: {
+        url: window.location.href,
+        timestamp: Date.now()
+      }
+    };
+
+    try {
+      if ('serviceWorker' in navigator) {
+        const reg = await navigator.serviceWorker.ready;
+        if (reg && typeof reg.showNotification === 'function') {
+          await reg.showNotification(title, options);
+          return true;
+        }
+      }
+
+      const notif = new Notification(title, options);
+      notif.onclick = () => {
+        window.focus();
+        try { notif.close(); } catch (_) {}
+      };
+      return true;
+    } catch (err) {
+      console.warn('Service worker notification failed, trying fallback:', err);
+      try {
+        const fallbackNotif = new Notification(title, options);
+        fallbackNotif.onclick = () => {
+          window.focus();
+          try { fallbackNotif.close(); } catch (_) {}
+        };
+        return true;
+      } catch (fallbackErr) {
+        console.warn('Standard notification constructor failed:', fallbackErr);
+        return false;
+      }
+    }
+  }
+
+  function sendTestNotification() {
+    const perm = getNotificationPermission();
+    if (perm === 'granted') {
+      triggerNotification('🔔 Проверка таймера Chrono', 'Тестовое системное уведомление Chrome работает отлично!', 'chrono-test');
+      showToast('✓ Тестовое уведомление отправлено в Chrome!', 'success');
+    } else if (perm === 'denied') {
+      showToast('⚠️ Уведомления заблокированы в настройках Chrome', 'error');
+      openPicker();
+    } else {
+      requestNotificationPermission();
     }
   }
 
@@ -1167,9 +1343,58 @@ document.addEventListener('DOMContentLoaded', () => {
   tabDuration.addEventListener('click', () => switchMode('duration'));
   tabTarget.addEventListener('click', () => switchMode('target'));
 
-  // Header Actions
   themeToggleBtn.addEventListener('click', toggleTheme);
   fullscreenToggleBtn.addEventListener('click', toggleFullscreen);
+
+  // Chrome & Web Notification Actions
+  if (notifyToggleBtn) {
+    notifyToggleBtn.addEventListener('click', () => {
+      const perm = getNotificationPermission();
+      if (perm === 'granted') {
+        sendTestNotification();
+      } else if (perm === 'denied') {
+        openPicker();
+      } else {
+        requestNotificationPermission();
+      }
+    });
+  }
+
+  if (modalEnableNotifyBtn) {
+    modalEnableNotifyBtn.addEventListener('click', () => {
+      requestNotificationPermission();
+    });
+  }
+
+  if (modalTestNotifyBtn) {
+    modalTestNotifyBtn.addEventListener('click', () => {
+      sendTestNotification();
+    });
+  }
+
+  if (allowNotifyBtn) {
+    allowNotifyBtn.addEventListener('click', () => {
+      if (notifyPrompt) notifyPrompt.classList.add('hidden');
+      requestNotificationPermission();
+    });
+  }
+
+  if (closeNotifyBtn) {
+    closeNotifyBtn.addEventListener('click', () => {
+      if (notifyPrompt) notifyPrompt.classList.add('hidden');
+      try {
+        sessionStorage.setItem('chrono_notify_prompt_dismissed', '1');
+      } catch (_) {}
+    });
+  }
+
+  if (typeof navigator !== 'undefined' && navigator.permissions && navigator.permissions.query) {
+    navigator.permissions.query({ name: 'notifications' }).then((status) => {
+      status.onchange = () => {
+        syncNotificationUI();
+      };
+    }).catch(() => {});
+  }
 
   // Timer Main Buttons
   togglePlayBtn.addEventListener('click', togglePlay);
@@ -1288,5 +1513,5 @@ document.addEventListener('DOMContentLoaded', () => {
   renderPresets();
   updateDurationDisplay(true);
   initTargetView();
-  checkNotificationStatus();
+  syncNotificationUI();
 });

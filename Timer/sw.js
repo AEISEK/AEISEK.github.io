@@ -1,16 +1,16 @@
 /**
  * TIMER PRO — Service Worker (PWA Offline Engine)
- * Version 2.4 — Network-First for Code Assets with Offline Fallback
+ * Version 2.5 — Network-First for Code Assets & Chrome Notifications
  */
 
-const CACHE_NAME = 'timer-pro-v2-4';
+const CACHE_NAME = 'timer-pro-v2-5';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './style.css?v=2.4',
-  './app.js?v=2.4',
-  './audio.js?v=2.4',
-  './confetti.js?v=2.4',
+  './style.css?v=2.5',
+  './app.js?v=2.5',
+  './audio.js?v=2.5',
+  './confetti.js?v=2.5',
   './icon.png',
   './favicon.png',
   './manifest.json'
@@ -92,3 +92,21 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
+
+// Notification Click: Focus existing open window or launch app
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      for (const client of clientList) {
+        if ('focus' in client) {
+          return client.focus();
+        }
+      }
+      if (self.clients.openWindow) {
+        return self.clients.openWindow('./');
+      }
+    })
+  );
+});
+
