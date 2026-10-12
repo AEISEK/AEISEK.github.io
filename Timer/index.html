@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=2.3">
+  <link rel="stylesheet" href="style.css?v=2.4">
 </head>
 <body>
   <!-- Canvas for celebration confetti -->
@@ -106,7 +106,7 @@
       <section id="durationView" class="view-panel active">
         <!-- Timer Title Input / Display -->
         <div class="timer-tag-wrapper">
-          <div class="timer-tag" id="timerTag" contenteditable="true" spellcheck="false" title="Нажмите, чтобы переименовать задачу">Фокусная сессия</div>
+          <div class="timer-tag" id="timerTag" contenteditable="true" spellcheck="false" title="Нажмите, чтобы переименовать задачу">Получасовой блок</div>
           <span class="tag-hint">✎ Нажмите для изменения</span>
         </div>
 
@@ -121,7 +121,7 @@
               </div>
               <span class="colon" id="colon1">:</span>
               <div class="digit-group" id="groupMinutes">
-                <input type="text" id="minsVal" class="digit-input" value="25" maxlength="2" inputmode="numeric" pattern="[0-9]*" title="Кликните для ввода минут или крутите колесико мыши" autocomplete="off" spellcheck="false">
+                <input type="text" id="minsVal" class="digit-input" value="30" maxlength="2" inputmode="numeric" pattern="[0-9]*" title="Кликните для ввода минут или крутите колесико мыши" autocomplete="off" spellcheck="false">
                 <span class="unit-sub">мин</span>
               </div>
               <span class="colon">:</span>
@@ -199,11 +199,11 @@
               <span class="preset-duration">15 мин</span>
               <span class="preset-name">Стендап</span>
             </button>
-            <button class="preset-card active" data-seconds="1500" data-label="Фокусная сессия">
+            <button class="preset-card" data-seconds="1500" data-label="Фокусная сессия">
               <span class="preset-duration">25 мин</span>
               <span class="preset-name">Помодоро</span>
             </button>
-            <button class="preset-card" data-seconds="1800" data-label="Получасовой блок">
+            <button class="preset-card active" data-seconds="1800" data-label="Получасовой блок">
               <span class="preset-duration">30 мин</span>
               <span class="preset-name">Получас</span>
             </button>
@@ -383,7 +383,7 @@
           <div class="stepper-col">
             <span class="stepper-title">Минуты</span>
             <button class="stepper-arrow" data-field="minutes" data-dir="1" aria-label="Больше минут">▲</button>
-            <input type="number" id="inputMinutes" class="stepper-input" min="0" max="59" value="25">
+            <input type="number" id="inputMinutes" class="stepper-input" min="0" max="59" value="30">
             <button class="stepper-arrow" data-field="minutes" data-dir="-1" aria-label="Меньше минут">▼</button>
           </div>
 
@@ -469,8 +469,8 @@
   </div>
 
   <!-- Scripts -->
-  <script src="audio.js?v=2.3"></script>
-  <script src="confetti.js?v=2.3"></script>
-  <script src="app.js?v=2.3"></script>
+  <script src="audio.js?v=2.4"></script>
+  <script src="confetti.js?v=2.4"></script>
+  <script src="app.js?v=2.4"></script>
 </body>
 </html>

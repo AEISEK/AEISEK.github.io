@@ -6,11 +6,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- State ---
   const state = {
     mode: 'duration', // 'duration' | 'target'
-    totalSeconds: 25 * 60,
-    remainingSeconds: 25 * 60,
+    totalSeconds: 30 * 60,
+    remainingSeconds: 30 * 60,
     isRunning: false,
     timerInterval: null,
-    taskName: 'Фокусная сессия',
+    taskName: 'Получасовой блок',
     theme: localStorage.getItem('chrono_theme') || 'dark',
     targetEvent: {
       title: localStorage.getItem('chrono_target_title') || 'Новый Год',
