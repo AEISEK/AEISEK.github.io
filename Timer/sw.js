@@ -1,16 +1,16 @@
 /**
  * TIMER PRO — Service Worker (PWA Offline Engine)
- * Version 2.5 — Network-First for Code Assets & Chrome Notifications
+ * Version 2.6 — Network-First for Code Assets & Chrome Notifications
  */
 
-const CACHE_NAME = 'timer-pro-v2-5';
+const CACHE_NAME = 'timer-pro-v2-6';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './style.css?v=2.5',
-  './app.js?v=2.5',
-  './audio.js?v=2.5',
-  './confetti.js?v=2.5',
+  './style.css?v=2.6',
+  './app.js?v=2.6',
+  './audio.js?v=2.6',
+  './confetti.js?v=2.6',
   './icon.png',
   './favicon.png',
   './manifest.json'
